@@ -1,0 +1,36 @@
+{
+  "name": "alumnios-ai-server",
+  "version": "1.0.0",
+  "description": "Backend API for AlumniOS AI",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "type": "module",
+  "keywords": [
+    "alumni",
+    "api",
+    "mern"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cloudinary": "^2.2.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^8.3.0",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^8.0.5",
+    "openai": "^4.104.0",
+    "razorpay": "^2.9.6",
+    "socket.io": "^4.8.3",
+    "streamifier": "^0.1.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}

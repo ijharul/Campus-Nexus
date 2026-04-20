@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: alumnios-ai-server
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: MONGO_URI
+        fromValue: ${MONGO_URI}
+      - key: JWT_SECRET
+        fromValue: ${JWT_SECRET}
+      - key: OPENAI_API_KEY
+        fromValue: ${OPENAI_API_KEY}
+      - key: CLOUDINARY_CLOUD_NAME
+        fromValue: ${CLOUDINARY_CLOUD_NAME}
+      - key: CLOUDINARY_API_KEY
+        fromValue: ${CLOUDINARY_API_KEY}
+      - key: CLOUDINARY_API_SECRET
+        fromValue: ${CLOUDINARY_API_SECRET}

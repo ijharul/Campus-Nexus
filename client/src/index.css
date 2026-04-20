@@ -1,0 +1,382 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── CSS Custom Properties ──────────────────────────────────────────────── */
+:root {
+  --font-display:  'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-body:     'Inter', system-ui, sans-serif;
+  --brand-primary: 14 165 233;
+  --brand-secondary: 79 70 229;
+}
+
+/* ── Base Styles ────────────────────────────────────────────────────────── */
+@layer base {
+  html {
+    font-family: var(--font-body);
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-[#080d17] text-slate-50 transition-colors duration-300;
+    font-size: 16px;
+    overflow: hidden;
+  }
+
+  /* ── Typography: headings use display font ── */
+  h1, h2, h3, h4, h5 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+
+  /* Smooth selection color */
+  ::selection {
+    @apply bg-sky-500/30 text-sky-900 dark:text-sky-100;
+  }
+}
+
+/* ── Component Classes ──────────────────────────────────────────────────── */
+@layer components {
+
+  /* ── Cards ── */
+  .pristine-card {
+    @apply bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl
+           border border-slate-200/60 dark:border-white/[0.07]
+           shadow-[0_4px_24px_rgba(0,0,0,0.06)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.4)]
+           rounded-2xl;
+  }
+
+  .glass-card {
+    @apply bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl
+           border border-slate-200/70 dark:border-white/[0.08]
+           shadow-[0_4px_20px_rgba(0,0,0,0.06)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.35)]
+           rounded-2xl;
+  }
+
+  .luminous-card {
+    @apply relative after:absolute after:inset-0 after:-z-10
+           after:bg-indigo-500/10 after:blur-[100px] after:rounded-full
+           after:opacity-0 hover:after:opacity-100
+           transition-all duration-700;
+  }
+
+  /* ── Buttons ── */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2
+           px-6 py-3 rounded-xl font-semibold text-sm text-white
+           bg-gradient-to-r from-sky-500 to-sky-600
+           hover:from-sky-600 hover:to-sky-700
+           shadow-lg shadow-sky-500/20 hover:shadow-sky-500/30
+           transition-all duration-200 hover:scale-[1.02] active:scale-[0.98];
+    font-family: var(--font-display);
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2
+           px-6 py-3 rounded-xl font-semibold text-sm
+           bg-slate-100 dark:bg-white/5
+           text-slate-700 dark:text-slate-300
+           border border-slate-200 dark:border-white/10
+           hover:bg-slate-200 dark:hover:bg-white/10
+           transition-all duration-200;
+    font-family: var(--font-display);
+  }
+
+  .btn-sky {
+    @apply btn-primary;
+  }
+
+  .btn-indigo {
+    @apply inline-flex items-center justify-center gap-2
+           px-6 py-3 rounded-xl font-semibold text-sm text-white
+           bg-gradient-to-r from-indigo-500 to-indigo-600
+           shadow-lg shadow-indigo-500/20
+           transition-all duration-200 hover:scale-[1.02] active:scale-[0.98];
+    font-family: var(--font-display);
+  }
+
+  .btn-premium {
+    @apply relative overflow-hidden px-6 py-3.5 rounded-xl font-bold text-sm
+           transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]
+           shadow-lg hover:shadow-xl;
+    font-family: var(--font-display);
+  }
+
+  /* ── Inputs ── */
+  .pristine-input {
+    @apply w-full bg-slate-950/60 backdrop-blur-xl
+           border border-white/10 rounded-xl px-4 py-3.5
+           shadow-[inset_0_1px_3px_rgba(0,0,0,0.2)]
+           focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500/50
+           transition-all font-medium placeholder-white/30 text-sky-100 outline-none;
+  }
+
+  .pristine-input:-webkit-autofill,
+  .pristine-input:-webkit-autofill:hover, 
+  .pristine-input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #e0f2fe;
+    -webkit-box-shadow: 0 0 0px 1000px #0f172a inset;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  .input-premium {
+    @apply w-full bg-slate-50 dark:bg-slate-900/60
+           border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3
+           text-slate-900 dark:text-white
+           focus:ring-2 focus:ring-sky-500/40 focus:border-sky-500/60
+           transition-all font-medium placeholder-slate-400 dark:placeholder-white/30 outline-none;
+  }
+
+  /* ── Label ── */
+  .field-label {
+    @apply block text-[11px] font-bold text-slate-500 dark:text-slate-400
+           uppercase tracking-widest mb-2;
+    font-family: var(--font-display);
+  }
+
+  /* ── Section heading ── */
+  .section-label {
+    @apply text-[10px] font-bold uppercase tracking-[0.2em]
+           text-slate-400 dark:text-slate-500;
+    font-family: var(--font-display);
+  }
+
+  /* ── Glass sidebar ── */
+  .glass-sidebar {
+    @apply bg-white/90 dark:bg-slate-950/90 backdrop-blur-3xl
+           border-r border-slate-200/50 dark:border-white/[0.06]
+           shadow-xl shadow-black/5 dark:shadow-black/40;
+  }
+
+  /* ── Stat card ── */
+  .glass-stat {
+    @apply bg-white/80 dark:bg-black/40 backdrop-blur-md
+           border border-slate-200/50 dark:border-white/5
+           shadow-sm px-5 py-3 rounded-full;
+  }
+
+  /* ── Tab Switcher ── */
+  .tab-switcher {
+    @apply flex bg-slate-100 dark:bg-white/5 p-1 rounded-xl border border-slate-200 dark:border-white/5;
+  }
+
+  .tab-btn {
+    @apply flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all duration-200;
+    font-family: var(--font-display);
+  }
+
+  .tab-btn-active {
+    @apply bg-sky-600 text-white shadow-md shadow-sky-600/20;
+  }
+
+  .tab-btn-active-orange {
+    @apply bg-orange-500 text-white shadow-md shadow-orange-500/20;
+  }
+
+  .tab-btn-inactive {
+    @apply text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white hover:bg-white/50 dark:hover:bg-white/5;
+  }
+
+  /* ── Liquid Switcher ── */
+  .liquid-switcher {
+    @apply relative p-1 bg-slate-100 dark:bg-white/5 rounded-xl flex
+           border border-slate-200 dark:border-white/5;
+  }
+
+  .liquid-switcher-pill {
+    @apply absolute inset-y-1 rounded-lg bg-white dark:bg-sky-600
+           shadow-sm transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)];
+  }
+
+  .liquid-switcher-btn {
+    @apply flex-1 relative z-10 py-2 text-xs font-bold tracking-tight transition-colors duration-300 uppercase;
+    font-family: var(--font-display);
+  }
+
+  /* ── Scrollbars ── */
+  .custom-scrollbar::-webkit-scrollbar    { width: 5px; }
+  .custom-scrollbar::-webkit-scrollbar-track { @apply bg-transparent; }
+  .custom-scrollbar::-webkit-scrollbar-thumb { @apply bg-slate-300 dark:bg-slate-700 rounded-full; }
+
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* ── Nav active state ── */
+  .nav-active-glow {
+    box-shadow: inset 0 0 16px rgba(14, 165, 233, 0.06),
+                0 0 0 1px rgba(14, 165, 233, 0.15);
+  }
+}
+
+/* ── Keyframes ──────────────────────────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+@keyframes slideUp6 {
+  from { transform: translateY(14px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+@keyframes slideInRight {
+  from { transform: translateX(16px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+@keyframes orbDrift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(20px, -15px) scale(1.04); }
+  66%       { transform: translate(-15px, 18px) scale(0.97); }
+}
+@keyframes floatSubtle {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes shimmerMove {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(14,165,233,0.25); }
+  50%       { box-shadow: 0 0 40px rgba(14,165,233,0.5); }
+}
+
+/* ── Animation Utilities ────────────────────────────────────────────────── */
+.animate-in          { animation-duration: 500ms; animation-fill-mode: both; }
+.fade-in             { animation-name: fadeIn; }
+.slide-in-from-bottom-8 { animation-name: slideUp; }
+.slide-in-from-bottom-6 { animation-name: slideUp6; }
+.slide-in-from-bottom-4 { animation-name: slideUp6; }
+.duration-1000 { animation-duration: 1000ms; }
+.duration-700  { animation-duration: 700ms; }
+
+.animate-float-subtle { animation: floatSubtle 8s ease-in-out infinite; }
+.animate-orb-drift    { animation: orbDrift 16s ease-in-out infinite; }
+.animate-spin-slow    { animation: spinSlow 25s linear infinite; }
+.animate-glow-pulse   { animation: glowPulse 3s ease-in-out infinite; }
+
+/* ── Text Utilities ─────────────────────────────────────────────────────── */
+.gradient-text-sky {
+  background: linear-gradient(135deg, #38bdf8, #818cf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-warm {
+  background: linear-gradient(135deg, #fb923c, #f43f5e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.font-outline {
+  -webkit-text-stroke: 1.5px rgba(56, 189, 248, 0.5);
+  color: transparent;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+/* ── Medal Glow Effects ─────────────────────────────────────────────────── */
+.medal-gold   { box-shadow: 0 0 16px rgba(251,191,36,0.45), 0 0 32px rgba(251,191,36,0.15); }
+.medal-silver { box-shadow: 0 0 12px rgba(203,213,225,0.4); }
+.medal-bronze { box-shadow: 0 0 12px rgba(180,83,9,0.35); }
+
+/* ── Global Premium Background ──────────────────────────────────────────── */
+.premium-grainy-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  background: #080d17;
+}
+
+.premium-grainy-bg::before {
+  content: "";
+  position: absolute;
+  top: -20%;
+  left: -20%;
+  width: 140%;
+  height: 140%;
+  opacity: 0.55;
+  mix-blend-mode: soft-light;
+  filter: blur(90px);
+  animation: orbDrift 22s ease-in-out infinite;
+  background:
+    radial-gradient(ellipse at 15% 20%, #38bdf8 0%, transparent 45%),
+    radial-gradient(ellipse at 80% 80%, #6366f1 0%, transparent 45%),
+    radial-gradient(ellipse at 45% 55%, #8b5cf6 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 15%, #06b6d4 0%, transparent 40%);
+}
+
+.premium-grainy-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.03;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* ── Auth / Login Background ────────────────────────────────────────────── */
+.cinematic-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: #04080f;
+  pointer-events: none;
+}
+
+.cinematic-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 15% 20%, rgba(56,189,248,0.18) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 80%, rgba(99,102,241,0.2)  0%, transparent 55%),
+    radial-gradient(ellipse at 50% 50%, rgba(139,92,246,0.1)   0%, transparent 60%);
+  z-index: 1;
+}
+
+.cinematic-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("/assets/login-elite-bg.png");
+  background-size: cover;
+  background-position: center;
+  opacity: 0.25;
+  filter: blur(2px) contrast(1.1) brightness(0.6);
+  z-index: 0;
+}
+
+/* ── Noise Texture ──────────────────────────────────────────────────────── */
+.pristine-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.025;
+  pointer-events: none;
+  z-index: 2;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* ── Shimmer Effect ─────────────────────────────────────────────────────── */
+.shimmer-effect {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent);
+  background-size: 200% 100%;
+  animation: shimmerMove 2s linear infinite;
+}
