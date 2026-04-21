@@ -19,22 +19,20 @@ import upload from "../middlewares/uploadMiddleware.js";
 
 const router = express.Router();
 
-// ── Static routes FIRST (before any :id param routes) ───────────────────────
-
-// Public Portfolio Access
-router.get("/u/:username", getPublicProfile);
-router.get("/:id", getPublicProfileById);
-
-// Directory (college-scoped by default, ?global=true for all)
-router.get("/", protect, getUsers);
-
-// Admin: list all users scoped by requester role
+// ── Static / Admin routes FIRST ───────────────────────
 router.get(
   "/all",
   protect,
   authorize("collegeAdmin", "superAdmin"),
   getAllUsers,
 );
+
+// Directory (college-scoped by default, ?global=true for all)
+router.get("/", protect, getUsers);
+
+// Public Portfolio Access
+router.get("/u/:username", getPublicProfile);
+router.get("/:id", getPublicProfileById);
 
 // View user profile by ID (for directory/profile viewing)
 router.get("/:id/profile", protect, getUserById);
