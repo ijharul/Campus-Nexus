@@ -106,13 +106,21 @@ const Login = () => {
                 <div className="space-y-1">
                   <div className="flex justify-between items-center px-2">
                     <label className="text-xs font-medium text-white/50">Password</label>
-                    <button 
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="text-[10px] font-bold text-white/30 hover:text-white uppercase tracking-wider transition-colors"
-                    >
-                      {showPassword ? "Hide" : "Show"}
-                    </button>
+                    <div className="flex items-center gap-3">
+                      <Link 
+                        to="/forgot-password" 
+                        className="text-[10px] font-bold text-sky-500/60 hover:text-sky-400 uppercase tracking-wider transition-colors"
+                      >
+                        Forgot?
+                      </Link>
+                      <button 
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="text-[10px] font-bold text-white/30 hover:text-white uppercase tracking-wider transition-colors"
+                      >
+                        {showPassword ? "Hide" : "Show"}
+                      </button>
+                    </div>
                   </div>
                   <input
                     name="password" type={showPassword ? 'text' : 'password'} required value={password}

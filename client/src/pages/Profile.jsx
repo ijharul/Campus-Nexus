@@ -13,7 +13,12 @@ import {
   ShieldAlert,
   ShieldCheck,
   Clock,
-  Briefcase
+  Briefcase,
+  Globe,
+  ExternalLink,
+  Share2,
+  Building2,
+  Sparkles
 } from "lucide-react";
 import ReportModal from "../components/ReportModal";
 import Button from "../components/ui/Button";
@@ -52,6 +57,9 @@ const Profile = () => {
     username: "",
     experience: [],
     projects: [],
+    socialLinks: [],
+    isPaidMentor: false,
+    pricePerSession: 0,
   });
 
   const fetchProfile = async () => {
@@ -72,13 +80,19 @@ const Profile = () => {
           name: data.name || "",
           bio: data.bio || "",
           company: data.company || "",
-          college: data.college || "",
+          college: data.collegeId?.name || data.college || "Global Nexus Network",
           currentRole: data.currentRole || "",
           skills: data.skills ? data.skills.join(", ") : "",
           batch: data.batch || "",
+          branch: data.branch || "",
+          year: data.year || "",
+          careerGoal: data.careerGoal || "",
           username: data.username || "",
           experience: data.experience || [],
           projects: data.projects || [],
+          socialLinks: data.socialLinks || [],
+          isPaidMentor: data.isPaidMentor || false,
+          pricePerSession: data.pricePerSession || 0,
         });
       }
     } catch (error) {
@@ -127,52 +141,48 @@ const Profile = () => {
     e.preventDefault();
     setSaving(true);
 
-    if (avatarFile) {
-      try {
-        const avatarData = new FormData();
-        avatarData.append("file", avatarFile);
-        const { data } = await api.put("/users/profile", avatarData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-        setProfile((prev) => ({
-          ...prev,
-          profilePicture: data.profilePicture,
-        }));
-        setUser((prev) => ({ ...prev, profilePicture: data.profilePicture }));
-        setAvatarFile(null);
-        setAvatarPreview(null);
-        toast.success("Profile picture updated successfully.");
-      } catch (err) {
-        toast.error("Failed to upload profile picture.");
-      }
-    }
-
     const updateData = new FormData();
-    updateData.append("name", formData.name);
-    updateData.append("bio", formData.bio);
-    updateData.append("company", formData.company);
-    updateData.append("college", formData.college);
-    updateData.append("currentRole", formData.currentRole);
-    updateData.append("skills", formData.skills);
-    if (formData.batch) updateData.append("batch", formData.batch);
-    if (file) updateData.append("file", file);
+    
+    // Add scalar fields
+    ['name', 'bio', 'company', 'currentRole', 'batch', 'branch', 'year', 'careerGoal', 'skills', 'isPaidMentor', 'pricePerSession'].forEach(key => {
+      if (formData[key] !== undefined && formData[key] !== null) {
+        updateData.append(key, formData[key]);
+      }
+    });
+    
+    // Add file (either profile picture or resume)
+    // Priority: avatarFile (newly selected pic) > file (other uploads)
+    if (avatarFile) {
+      updateData.append("file", avatarFile);
+    } else if (file) {
+      updateData.append("file", file);
+    }
+    
+    // Add complex fields
     updateData.append("experience", JSON.stringify(formData.experience));
     updateData.append("projects", JSON.stringify(formData.projects));
+    updateData.append("socialLinks", JSON.stringify(formData.socialLinks));
 
     try {
       const { data } = await api.put("/users/profile", updateData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+      
       setProfile(data);
       setUser((prev) => ({
         ...prev,
         name: data.name,
         profilePicture: data.profilePicture,
       }));
-      toast.success("Your changes have been saved.");
+      
+      // Reset local file states
+      setAvatarFile(null);
+      setAvatarPreview(null);
       setFile(null);
+      
+      toast.success("Professional identity updated successfully.");
     } catch (error) {
-      toast.error(error.response?.data?.message || "Error saving profile.");
+      toast.error(error.response?.data?.message || "Error saving profile mesh.");
     } finally {
       setSaving(false);
     }
@@ -389,7 +399,7 @@ const Profile = () => {
                   className="!py-3.5"
                 />
               </div>
-              {user.role !== "collegeAdmin" && (
+              {user?.role !== "collegeAdmin" && (
                 <>
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">
@@ -435,16 +445,13 @@ const Profile = () => {
 
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">
-                      College/Institution
+                      Verified Institution
                     </label>
-                    <Input
-                      name="college"
-                      placeholder="e.g. Stanford University"
-                      value={formData.college}
-                      onChange={handleChange}
-                      className="!py-3.5"
-                      disabled={true}
-                    />
+                    <div className="px-4 py-3.5 rounded-xl bg-slate-900/50 border border-emerald-500/10 text-emerald-400 font-black text-sm uppercase tracking-widest flex items-center gap-3">
+                       <Building2 className="w-4 h-4" />
+                       {formData.college}
+                       <div className="ml-auto px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/20 rounded-md text-[8px] tracking-[0.2em]">Verified</div>
+                    </div>
                   </div>
 
                   {!(user.role === 'student' && formData.currentRole !== 'intern') && (
@@ -491,8 +498,104 @@ const Profile = () => {
             </div>
           </div>
 
+          {/* ── Social Hub ── */}
+          <div className="bg-slate-900/40 rounded-[2rem] p-8 md:p-10 border border-white/5 shadow-lg space-y-8">
+            <div className="flex justify-between items-center border-b border-white/5 pb-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-white/5 rounded-xl border border-white/10 flex items-center justify-center text-sky-500">
+                    <Globe className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-3xl font-bold text-white tracking-tighter">Social Hub</h3>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleAddArrayItem("socialLinks", { platform: "LinkedIn", url: "" })}
+                  className="!rounded-xl px-4 font-bold border-white/10 text-slate-300 hover:text-white"
+                >
+                  <Plus className="h-4 w-4 mr-2" /> Add Link
+                </Button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {formData.socialLinks.map((social, index) => (
+                  <div key={index} className="flex items-center gap-3 p-5 bg-white/5 dark:bg-slate-950/50 border border-white/10 rounded-2xl group transition-all hover:border-sky-500/30">
+                    <div className="shrink-0">
+                       <select 
+                          value={social.platform}
+                          onChange={(e) => handleArrayChange("socialLinks", index, "platform", e.target.value)}
+                          className="bg-slate-900 text-[10px] font-black uppercase tracking-widest text-sky-500 border border-white/10 rounded-lg px-2 py-1 focus:ring-1 focus:ring-sky-500/50 outline-none cursor-pointer appearance-none"
+                       >
+                          <option value="LinkedIn" className="bg-slate-900">LinkedIn</option>
+                          <option value="GitHub" className="bg-slate-900">GitHub</option>
+                          <option value="Twitter" className="bg-slate-900">Twitter</option>
+                          <option value="Portfolio" className="bg-slate-900">Portfolio</option>
+                          <option value="Other" className="bg-slate-900">Other</option>
+                       </select>
+                    </div>
+                    <div className="flex-1 relative">
+                        <input 
+                          type="url"
+                          placeholder="https://..."
+                          value={social.url}
+                          onChange={(e) => handleArrayChange("socialLinks", index, "url", e.target.value)}
+                          className="w-full bg-transparent border-b border-white/10 focus:border-sky-500 focus:ring-0 text-sm font-medium text-slate-300 placeholder:text-slate-600 py-1 transition-colors"
+                        />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveArrayItem("socialLinks", index)}
+                      className="p-2 text-slate-500 hover:text-rose-500 transition-colors bg-white/5 rounded-xl border border-white/5 hover:border-rose-500/20"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+            </div>
+          </div>
+
+          {/* ── Mentorship Monetization (Alumni Only) ── */}
+          {user?.role === 'alumni' && (
+            <div className="bg-slate-900/40 rounded-[2rem] p-8 md:p-10 border border-white/5 shadow-lg space-y-8 animate-in fade-in duration-500">
+                <div className="flex items-center gap-4 border-b border-white/5 pb-6">
+                  <div className="w-12 h-12 bg-emerald-500/10 rounded-xl border border-emerald-500/20 flex items-center justify-center text-emerald-500">
+                    <Sparkles className="w-6 h-6" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-3xl font-bold text-white tracking-tighter">Monetization</h3>
+                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Optional premium mentorship settings</p>
+                  </div>
+                  <div className="flex items-center gap-3 bg-slate-950/50 p-2 rounded-2xl border border-white/5">
+                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-2">{formData.isPaidMentor ? 'Enabled' : 'Disabled'}</span>
+                     <button 
+                        type="button"
+                        onClick={() => setFormData({...formData, isPaidMentor: !formData.isPaidMentor})}
+                        className={`relative w-12 h-6 rounded-full flex items-center px-1 transition-all ${formData.isPaidMentor ? 'bg-emerald-500 shadow-lg shadow-emerald-500/20' : 'bg-white/10'}`}
+                     >
+                        <div className={`w-4 h-4 bg-white rounded-full transition-all ${formData.isPaidMentor ? 'translate-x-6' : 'translate-x-0'}`} />
+                     </button>
+                  </div>
+                </div>
+
+                <div className={`grid grid-cols-1 md:grid-cols-2 gap-8 transition-opacity duration-300 ${formData.isPaidMentor ? 'opacity-100' : 'opacity-30 pointer-events-none'}`}>
+                   <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Price Per Session (₹)</label>
+                      <Input 
+                        type="number"
+                        name="pricePerSession"
+                        value={formData.pricePerSession}
+                        onChange={handleChange}
+                        placeholder="e.g. 500"
+                        className="!py-3.5"
+                      />
+                   </div>
+                </div>
+            </div>
+          )}
+
           {/* ── Experience, Projects, Resume (Hidden for Admins) ── */}
-          {user.role !== "collegeAdmin" && (
+          {user?.role !== "collegeAdmin" && (
             <>
               {/* ── Experience ── */}
               {!(user.role === 'student' && formData.currentRole !== 'intern') && (
@@ -926,6 +1029,31 @@ const Profile = () => {
                     </>
                   )}
                 </div>
+
+                {/* Social Links View */}
+                {profile?.socialLinks?.length > 0 && (
+                   <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-4">Professional Presence</label>
+                      <div className="flex flex-wrap gap-4">
+                        {profile.socialLinks.map((link, i) => {
+                          const Icon = Globe;
+                          return (
+                            <a 
+                              key={i}
+                              href={link.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-3 px-4 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-sky-500/10 dark:hover:bg-sky-500/10 hover:text-sky-500 rounded-xl transition-all border border-transparent hover:border-sky-500/20 group"
+                            >
+                              <Icon className="w-4 h-4" />
+                              <span className="text-sm font-bold">{link.platform}</span>
+                              <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </a>
+                          );
+                        })}
+                      </div>
+                   </div>
+                )}
               </div>
             </div>
           )}

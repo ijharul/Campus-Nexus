@@ -73,3 +73,37 @@ export const sendApprovalNotification = async ({ userEmail, collegeName }) => {
     console.error('❌ Email Notification Error:', err);
   }
 };
+
+/**
+ * @desc    Send password reset email
+ */
+export const sendPasswordResetEmail = async ({ userEmail, resetUrl }) => {
+  if (!process.env.GMAIL_USER) return;
+
+  const mailOptions = {
+    from: `"Campus Nexus Support" <${process.env.GMAIL_USER}>`,
+    to: userEmail,
+    subject: '🔐 Password Reset Request',
+    html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;">
+        <h2 style="color: #0ea5e9;">Password Reset Request</h2>
+        <p>You are receiving this email because you (or someone else) have requested the reset of the password for your account.</p>
+        <p>Please click on the button below to complete the process:</p>
+        <div style="margin-top: 30px; text-align: center;">
+          <a href="${resetUrl}" style="background: #0ea5e9; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Reset Password</a>
+        </div>
+        <p style="margin-top: 30px; font-size: 12px; color: #64748b;">If you did not request this, please ignore this email and your password will remain unchanged.</p>
+        <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;">
+        <p style="font-size: 10px; color: #94a3b8;">This link will expire in 10 minutes.</p>
+      </div>
+    `,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log('✅ Password reset email sent');
+  } catch (err) {
+    console.error('❌ Reset Email Error:', err);
+    throw new Error('Email could not be sent');
+  }
+};

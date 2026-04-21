@@ -31,6 +31,14 @@ import Chat from "./pages/Chat";
 import Notices from "./pages/Notices";
 import Leaderboard from "./pages/Leaderboard";
 import PublicProfile from "./pages/PublicProfile";
+import WeeklyMomentum from "./pages/WeeklyMomentum";
+import PlacementDrives from "./pages/PlacementDrives";
+import CreatePlacementDrive from "./pages/CreatePlacementDrive";
+import PlacementDriveDetails from "./pages/PlacementDriveDetails";
+import OpportunityHub from "./pages/OpportunityHub";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import CareerSwitcher from "./pages/CareerSwitcher";
 
 const RoleRedirect = () => {
   const { user, loading } = useContext(AuthContext);
@@ -62,6 +70,9 @@ function App() {
               <Route path="/login" element={<ProtectedRoute allowedRoles={null}><Login /></ProtectedRoute>} />
               <Route path="/signup" element={<ProtectedRoute allowedRoles={null}><Signup /></ProtectedRoute>} />
               <Route path="/u/:username" element={<PublicProfile />} />
+              <Route path="/alumni/:id" element={<PublicProfile />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password/:token" element={<ResetPassword />} />
               <Route path="/" element={<RoleRedirect />} />
 
               {/* Protected Routes */}
@@ -75,6 +86,9 @@ function App() {
                   <Route path="/admin/college/reports" element={<CollegeAdminDashboard section="reports" />} />
                   <Route path="/admin/college/campaigns" element={<CollegeAdminDashboard section="campaigns" />} />
                   <Route path="/admin/college/verification" element={<CollegeAdminDashboard section="verification" />} />
+                  <Route path="/admin/drives" element={<PlacementDrives />} />
+                  <Route path="/admin/drives/create" element={<CreatePlacementDrive />} />
+                  <Route path="/admin/drives/:id" element={<PlacementDriveDetails />} />
                   <Route path="/admin/super" element={<SuperAdminDashboard section="overview" />} />
                   <Route path="/admin/super/colleges" element={<SuperAdminDashboard section="colleges" />} />
                   <Route path="/admin/super/revenue" element={<SuperAdminDashboard section="revenue" />} />
@@ -95,7 +109,10 @@ function App() {
                     <Route path="/referrals" element={<Referrals />} />
                     <Route path="/student/planner" element={<StudentPlanner />} />
                     <Route path="/ai" element={<CareerAssistant />} />
+                    <Route path="/career-switcher" element={<CareerSwitcher />} />
                     <Route path="/pricing" element={<Pricing />} />
+                    <Route path="/momentum" element={<WeeklyMomentum />} />
+                    <Route path="/opportunity-hub" element={<OpportunityHub />} />
                   </Route>
 
                   <Route element={<ProtectedRoute allowedRoles={MSG_ROLES} />}>

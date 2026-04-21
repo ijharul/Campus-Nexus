@@ -1,7 +1,8 @@
 import User from "../models/User.js";
 import CollegeRequest from "../models/CollegeRequest.js";
-import { sendCollegeRequestAlert } from "../utils/emailService.js";
+import { sendCollegeRequestAlert, sendPasswordResetEmail } from "../utils/emailService.js";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 
 // Generate JWT — embed id, role, and collegeId for middleware use
 const generateToken = (id, role, collegeId) => {
@@ -140,6 +141,88 @@ export const authUser = async (req, res, next) => {
       res.status(401);
       throw new Error("Invalid email or password.");
     }
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Forgot Password - request reset link
+ * @route   POST /api/auth/forgotpassword
+ * @access  Public
+ */
+export const forgotPassword = async (req, res, next) => {
+  try {
+    const user = await User.findOne({ email: req.body.email });
+
+    if (!user) {
+      res.status(404);
+      throw new Error('There is no user with that email');
+    }
+
+    // Get reset token
+    const resetToken = user.getResetPasswordToken();
+
+    await user.save({ validateBeforeSave: false });
+
+    // Create reset url
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+
+    try {
+      await sendPasswordResetEmail({
+        userEmail: user.email,
+        resetUrl,
+      });
+
+      res.status(200).json({ success: true, data: 'Email sent' });
+    } catch (err) {
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpire = undefined;
+
+      await user.save({ validateBeforeSave: false });
+
+      res.status(500);
+      throw new Error('Email could not be sent');
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Reset Password
+ * @route   PUT /api/auth/resetpassword/:resettoken
+ * @access  Public
+ */
+export const resetPassword = async (req, res, next) => {
+  try {
+    // Get hashed token
+    const resetPasswordToken = crypto
+      .createHash('sha256')
+      .update(req.params.resettoken)
+      .digest('hex');
+
+    const user = await User.findOne({
+      resetPasswordToken,
+      resetPasswordExpire: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      res.status(400);
+      throw new Error('Invalid or expired reset token');
+    }
+
+    // Set new password
+    user.password = req.body.password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      data: 'Password reset successful',
+    });
   } catch (error) {
     next(error);
   }

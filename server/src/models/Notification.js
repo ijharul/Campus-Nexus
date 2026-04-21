@@ -7,14 +7,28 @@ const notificationSchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
+    // sender is optional — system notifications have no sender
     sender: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
+      required: false,
+      default: null,
     },
     type: {
       type: String,
-      enum: ['mentorship', 'referral', 'message', 'request_accepted', 'request_rejected', 'donation'],
+      enum: [
+        'mentorship',
+        'referral',
+        'message',
+        'request_accepted',
+        'request_rejected',
+        'request_referred',
+        'request_interview',
+        'request_selected',
+        'request_completed',
+        'donation',
+        'system',
+      ],
       required: true,
     },
     message: {

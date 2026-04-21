@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
-import { Menu, X } from 'lucide-react';
+import NotificationCenter from './NotificationCenter';
+import SearchBox from './SearchBox';
+import { Menu, X, Search, Zap } from 'lucide-react';
 
 const DashboardLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -40,6 +42,22 @@ const DashboardLayout = () => {
           >
             {isSidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
+        </header>
+
+        {/* ── Top Utility Bar (Desktop) ── */}
+        <header className="hidden lg:flex items-center justify-between px-8 py-4 border-b border-white/[0.06] backdrop-blur-md bg-slate-950/10 z-10">
+           <div className="flex-1">
+             <SearchBox />
+           </div>
+
+           <div className="flex items-center gap-6">
+              <div className="flex items-center gap-2 px-3 py-1 bg-amber-500/10 border border-amber-500/20 rounded-full">
+                 <Zap className="w-3 h-3 text-amber-500" />
+                 <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest">Nexus IQ Ready</span>
+              </div>
+              <div className="h-4 w-px bg-white/5" />
+              <NotificationCenter />
+           </div>
         </header>
 
         {/* Main Content Area */}

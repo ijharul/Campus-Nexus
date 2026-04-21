@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
 import { AuthContext } from "../contexts/AuthContext";
+import toast from "react-hot-toast";
 import {
   Mail,
   Lock,
@@ -81,6 +82,17 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    // Email validation
+    const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    if (!emailRegex.test(form.email)) {
+      return setError("Please enter a valid email address.");
+    }
+
+    // Password validation
+    if (form.password.length < 6) {
+      return setError("Password must be at least 6 characters long.");
+    }
     
     if (form.password !== form.confirmPassword) {
       return setError("Passwords do not match. Please try again.");
@@ -92,7 +104,12 @@ const Signup = () => {
       if (form.role === 'student') delete signupData.batch;
       
       const res = await api.post('/auth/signup', signupData);
-      if (res.data.success) {
+      // Backend returns buildUserPayload directly, not wrapped in { success: true }
+      if (res.data && res.data._id) {
+        toast.success("Account created successfully! Please login to your new dashboard.", {
+          duration: 6000,
+          icon: '🚀'
+        });
         navigate('/login');
       }
     } catch (err) {

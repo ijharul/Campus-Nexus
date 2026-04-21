@@ -3,6 +3,7 @@ import User from '../models/User.js';
 import { createNotify } from '../utils/notification.js';
 import cloudinary from '../config/cloudinary.js';
 import streamifier from 'streamifier';
+import ActivityLog from '../models/ActivityLog.js';
 
 const streamUploadToCloudinary = (buffer, options) =>
   new Promise((resolve, reject) => {
@@ -83,6 +84,14 @@ export const sendReferralRequest = async (req, res, next) => {
       link: '/referrals'
     });
 
+    // Log Activity
+    ActivityLog.create({
+      user: studentId,
+      action: 'referral_request',
+      details: { alumniId, company, role },
+      collegeId: req.user.collegeId || null,
+    }).catch(() => {});
+
     res.status(201).json(referral);
   } catch (error) {
     next(error);
@@ -160,6 +169,22 @@ export const updateReferralStatus = async (req, res, next) => {
         await User.findByIdAndUpdate(req.user._id, { $inc: { contributionScore: points } });
       }
 
+      // --- ALUMNI IMPACT LOGIC ---
+      const alumni = await User.findById(req.user._id);
+      if (status === 'referred') {
+        alumni.impactStats.referralsGiven += 1;
+        if (alumni.impactStats.referralsGiven >= 5 && !alumni.badges.includes('Referral Expert')) {
+          alumni.badges.push('Referral Expert');
+        }
+      }
+      if (status === 'selected') {
+        alumni.impactStats.successfulPlacements += 1;
+        if (alumni.impactStats.successfulPlacements >= 3 && !alumni.badges.includes('Community Leader')) {
+          alumni.badges.push('Community Leader');
+        }
+      }
+      await alumni.save();
+
       // Notify Student
       await createNotify({
         recipient: referral.student,
@@ -168,6 +193,14 @@ export const updateReferralStatus = async (req, res, next) => {
         message: `Your referral request for ${referral.company} was moved to ${status} by ${req.user.name}.`,
         link: '/referrals'
       });
+
+      // Log Activity
+      ActivityLog.create({
+        user: req.user._id,
+        action: 'referral_update',
+        details: { referralId: referral._id, status, company: referral.company },
+        collegeId: req.user.collegeId || null,
+      }).catch(() => {});
 
       res.json(updatedReferral);
     } else {

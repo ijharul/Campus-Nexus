@@ -1,11 +1,13 @@
 import express from 'express';
-import { registerUser, authUser } from '../controllers/authController.js';
+import { registerUser, authUser, forgotPassword, resetPassword } from '../controllers/authController.js';
 import { protect, authorize } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
 router.post('/signup', registerUser);
 router.post('/login', authUser);
+router.post('/forgotpassword', forgotPassword);
+router.put('/resetpassword/:resettoken', resetPassword);
 
 // -------------------------------------------------------------
 // EXAMPLE OF A PROTECTED ROUTE (You can remove this later)

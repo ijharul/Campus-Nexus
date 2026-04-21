@@ -25,6 +25,7 @@ const userPayload = (u) => ({
   currentRole: u.currentRole,
   experience: u.experience,
   projects: u.projects,
+  socialLinks: u.socialLinks,
   batch: u.batch,
   branch: u.branch,
   year: u.year,
@@ -57,7 +58,7 @@ export const updateUserProfile = async (req, res, next) => {
         : req.body.skills.split(',').map((s) => s.trim()).filter(Boolean);
     }
 
-    ['experience', 'projects'].forEach((f) => {
+    ['experience', 'projects', 'socialLinks'].forEach((f) => {
       if (req.body[f]) {
         try { user[f] = typeof req.body[f] === 'string' ? JSON.parse(req.body[f]) : req.body[f]; }
         catch (e) { console.error(`${f} parse error`, e); }
@@ -100,6 +101,13 @@ export const getUsers = async (req, res, next) => {
     if (skills) {
       const arr = skills.split(',').map((s) => new RegExp(s.trim(), 'i'));
       query.skills = { $in: arr };
+    }
+
+    if (role === 'top_mentors') {
+      query.role = 'alumni';
+      // Sort by contributionScore or studentsHelped
+      const users = await User.find(query).select('-password').populate('collegeId', 'name location').sort({ contributionScore: -1 }).limit(10);
+      return res.json(users);
     }
 
     const users = await User.find(query).select('-password').populate('collegeId', 'name location').sort({ createdAt: -1 });
@@ -274,5 +282,51 @@ export const getPublicProfile = async (req, res, next) => {
     
     if (!user) { res.status(404); throw new Error('Public profile not found or set to private.'); }
     res.json(user);
+  } catch (error) { next(error); }
+};
+/**
+ * @desc    Get user profile by ID (Public Portfolio)
+ * @route   GET /api/users/:id
+ */
+export const getPublicProfileById = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id)
+      .select('-password -aiCallsToday -tokens -isBlocked')
+      .populate('collegeId', 'name location');
+    
+    if (!user) { res.status(404); throw new Error('Public profile not found.'); }
+    res.json(user);
+  } catch (error) { next(error); }
+};
+/**
+ * @desc    Rate an alumni mentor and provide a testimonial
+ * @route   POST /api/users/:id/rate
+ */
+export const rateMentor = async (req, res, next) => {
+  try {
+    const { rating, feedback } = req.body;
+    const alumni = await User.findById(req.params.id);
+    
+    if (!alumni || alumni.role !== 'alumni') {
+      res.status(404); throw new Error('Alumni mentor not found.');
+    }
+
+    // Add to ratings
+    alumni.ratings.push({
+      studentId: req.user._id,
+      rating,
+      feedback
+    });
+
+    // If high rating, also add to testimonials
+    if (rating >= 4 && feedback) {
+      alumni.testimonials.push({
+        studentId: req.user._id,
+        text: feedback
+      });
+    }
+
+    await alumni.save();
+    res.json({ message: 'Success stories shared! Thank you for the feedback.' });
   } catch (error) { next(error); }
 };

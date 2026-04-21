@@ -222,3 +222,70 @@ export const analyzeSkillsGap = async (req, res, next) => {
     next(error);
   }
 };
+/**
+ * @desc    Analyzes Career Switch feasibility and transition plan
+ * @route   POST /api/ai/career-switch
+ * @access  Private
+ */
+export const analyzeCareerSwitch = async (req, res, next) => {
+  try {
+    const { currentRole, targetRole, yearsOfExperience } = req.body;
+
+    if (!currentRole || !targetRole) {
+      res.status(400);
+      throw new Error('Please provide currentRole and targetRole.');
+    }
+
+    const user = await User.findById(req.user._id);
+    if (!user) { res.status(404); throw new Error('User not found'); }
+
+    // Lazy Reset
+    const now = new Date();
+    const lastUsed = user.lastUsedAI ? new Date(user.lastUsedAI) : null;
+    const isNewDay = !lastUsed || now.toDateString() !== lastUsed.toDateString();
+
+    if (isNewDay) {
+      user.aiCallsToday = 0;
+      user.lastUsedAI = now;
+    }
+
+    if (user.aiCallsToday >= 5) {
+      res.status(429);
+      throw new Error('Daily AI limit reached (5/5).');
+    }
+
+    if (user.tokens < 2) {
+      res.status(403);
+      throw new Error('Career Switch analysis requires 2 tokens.');
+    }
+
+    const prompt = `You are a Career Transition Specialist. Analyze a career switch from "${currentRole}" to "${targetRole}" for someone with ${yearsOfExperience || 0} years of experience.
+    Identify transferable skills, the difficulty level, and a step-by-step transition plan.
+    Respond ONLY in valid JSON format:
+    {
+      "transferableSkills": ["skill1", "skill2"],
+      "difficultyLevel": "Easy/Medium/Hard",
+      "estimatedTimeline": "e.g. 6-12 months",
+      "bridgeSteps": [
+        { "step": "Action Item", "detail": "Why and how" }
+      ],
+      "industryInsights": "Key market trends for the target role"
+    }`;
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      response_format: { type: "json_object" },
+      messages: [{ role: "user", content: prompt }],
+    });
+
+    const parsedResponse = JSON.parse(completion.choices[0].message.content);
+    
+    user.aiCallsToday += 1;
+    user.tokens -= 2;
+    await user.save();
+
+    res.json(parsedResponse);
+  } catch (error) {
+    next(error);
+  }
+};

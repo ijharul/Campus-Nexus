@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Menu, LogOut, User, Brain, Bell } from 'lucide-react';
 import { AuthContext } from '../contexts/AuthContext';
 import NotificationCenter from './NotificationCenter';
+import SearchBox from './SearchBox';
 
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
@@ -35,6 +36,12 @@ const Navbar = () => {
                 <span className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Campus Nexus</span>
               </Link>
             </div>
+            
+            {user && (
+              <div className="hidden lg:block flex-1 max-w-md mx-8">
+                <SearchBox />
+              </div>
+            )}
             
             {user && (
               <div className="hidden sm:ml-10 sm:flex sm:space-x-8">

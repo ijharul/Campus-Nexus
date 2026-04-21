@@ -1,6 +1,7 @@
 import Mentorship from "../models/Mentorship.js";
 import User from "../models/User.js";
 import { createNotify } from "../utils/notification.js";
+import ActivityLog from "../models/ActivityLog.js";
 
 /**
  * @desc    Send a new mentorship request
@@ -47,6 +48,14 @@ export const sendMentorshipRequest = async (req, res, next) => {
       message: `${req.user.name} sent you a mentorship request.`,
       link: "/mentorship",
     });
+
+    // Log Activity
+    ActivityLog.create({
+      user: studentId,
+      action: 'mentorship_request',
+      details: { mentorId },
+      collegeId: req.user.collegeId || null,
+    }).catch(() => {});
 
     res.status(201).json(request);
   } catch (error) {
@@ -175,6 +184,18 @@ export const updateMentorshipStatus = async (req, res, next) => {
       request.status = status;
       const updatedRequest = await request.save();
 
+      // --- ALUMNI IMPACT LOGIC ---
+      if (status === 'accepted') {
+        const alumni = await User.findById(req.user._id);
+        alumni.impactStats.studentsHelped += 1;
+        
+        // Auto-assign badge for milestones
+        if (alumni.impactStats.studentsHelped >= 5 && !alumni.badges.includes('Top Mentor')) {
+          alumni.badges.push('Top Mentor');
+        }
+        await alumni.save();
+      }
+
       // Notify Student
       await createNotify({
         recipient: request.student,
@@ -183,6 +204,14 @@ export const updateMentorshipStatus = async (req, res, next) => {
         message: `Your mentorship request was ${status} by ${req.user.name}.`,
         link: "/mentorship",
       });
+
+      // Log Activity
+      ActivityLog.create({
+        user: req.user._id,
+        action: 'mentorship_update',
+        details: { requestId: request._id, status },
+        collegeId: req.user.collegeId || null,
+      }).catch(() => {});
 
       res.json(updatedRequest);
     } else {

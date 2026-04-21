@@ -19,7 +19,8 @@ const activityLogSchema = new mongoose.Schema(
         'chat_message',
         'badge_earned',
         'ai_usage',
-        'post_engagement'
+        'post_engagement',
+        'application',          // job application via referral
       ],
     },
     details: {
@@ -31,9 +32,10 @@ const activityLogSchema = new mongoose.Schema(
       default: 0,
     },
     collegeId: {
-       type: mongoose.Schema.Types.ObjectId,
-       ref: 'College',
-       required: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'College',
+      required: false,   // optional — cross-college actions may lack a college context
+      default: null,
     }
   },
   { timestamps: true }

@@ -2,77 +2,38 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 
 /**
- * Seeds default test accounts for all roles
+ * Seeds the official Super Admin account
  * Called once at server startup after DB connection
  */
 const seedSuperAdmin = async () => {
   try {
-    // Check if any admin exists
-    const existing = await User.findOne({ role: "superAdmin" });
+    // Check if the specific super admin already exists
+    const existing = await User.findOne({ email: "haqueijharul0786@gmail.com" });
+    
     if (existing) {
-      console.log("Test users already exist — skipping seed.");
+      // Ensure the password is correct even if user exists (for reset purposes)
+      existing.password = "Projects@1127";
+      await existing.save();
+      console.log("Super Admin password synchronized.");
       return;
     }
 
-    // Create test users for all roles
-    const testUsers = [
-      {
-        name: "Super Admin",
-        email: "super@admin.com",
-        password: "Admin@123",
-        role: "superAdmin",
-        planName: "none",
-        tokens: 9999,
-      },
-      {
-        name: "John Student",
-        email: "student@example.com",
-        password: "Student@123",
-        role: "student",
-        planName: "Free",
-        tokens: 50,
-        collegeId: null,
-        year: 2,
-        branch: "CSE",
-      },
-      {
-        name: "Sarah Alumni",
-        email: "alumni@example.com",
-        password: "Alumni@123",
-        role: "alumni",
-        planName: "none",
-        tokens: 50,
-        collegeId: null,
-        company: "Google",
-        currentRole: "Software Engineer",
-        batch: 2020,
-      },
-      {
-        name: "College Admin",
-        email: "admin@college.com",
-        password: "Admin@123",
-        role: "collegeAdmin",
-        planName: "none",
-        tokens: 50,
-        collegeId: null,
-      },
-    ];
+    // Create the official Super Admin
+    const superAdmin = {
+      name: "Super Admin",
+      email: "haqueijharul0786@gmail.com",
+      password: "Projects@1127", // Plain text, User model will hash it in pre-save
+      role: "superAdmin",
+      planName: "none",
+      tokens: 999999,
+    };
 
-    // Hash passwords before bulk insert (insertMany bypasses mongoose pre 'save' hooks)
-    const hashedUsers = await Promise.all(
-      testUsers.map(async (u) => ({
-        ...u,
-        password: await bcrypt.hash(u.password, 10),
-      })),
-    );
+    await User.create(superAdmin);
 
-    await User.insertMany(hashedUsers);
-
-    console.log("🌱 Test users seeded:");
-    console.log("   👤 Super Admin: super@admin.com / Admin@123");
-    console.log("   👨‍🎓 Student: student@example.com / Student@123");
-    console.log("   🎓 Alumni: alumni@example.com / Alumni@123");
-    console.log("   🏫 College Admin: admin@college.com / Admin@123");
+    console.log("🚀 PRODUCTION SEED COMPLETE:");
+    console.log("   👤 Super Admin: haqueijharul0786@gmail.com / [CONFIGURED]");
+    console.log("   ⚠️ System is now ready for production requests.");
+    
   } catch (err) {
     console.error("Seed error:", err.message);
   }

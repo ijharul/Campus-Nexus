@@ -3,9 +3,9 @@ import { NavLink, useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 import {
   LayoutDashboard, Users, UserCheck, Inbox, Building, Brain,
-  LogOut, Zap, CreditCard,
+  LogOut, Zap, CreditCard, Briefcase,
   ShieldCheck, MessageSquare, Target, X, Trophy, Bell, BookOpen, Gem,
-  ShieldAlert,
+  ShieldAlert, Activity, Shuffle
 } from 'lucide-react';
 
 const NexusLogo = () => (
@@ -111,6 +111,8 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
             <NavItem to="/leaderboard"    icon={Trophy}       label="Leaderboard" />
             <NavItem to="/chat"           icon={MessageSquare} label="Chat" />
             <NavItem to="/student/planner" icon={BookOpen}   label="Study Planner" />
+            <NavItem to="/momentum"         icon={Activity}   label="Momentum"      badge="New" />
+            <NavItem to="/opportunity-hub"  icon={Building}   label="Opportunity Hub" />
             <NavItem to="/pricing"          icon={Gem}        label="Upgrade Plan" />
           </>
         )}
@@ -128,6 +130,8 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
             <SectionLabel label="Community" />
             <NavItem to="/leaderboard"      icon={Trophy}         label="Leaderboard" />
             <NavItem to="/chat"             icon={MessageSquare}  label="Chat" />
+            <NavItem to="/momentum"         icon={Activity}       label="Analytics"     badge="Pro" />
+            <NavItem to="/career-switcher"  icon={Shuffle}        label="Switch Careers" badge="AI" />
             <NavItem to="/alumni/donations" icon={Zap}            label="Donations" />
           </>
         )}
@@ -140,6 +144,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
             <NavItem to="/admin/college/verification" icon={ShieldCheck}     label="Verify Members" />
             <NavItem to="/admin/college/users"        icon={Users}           label="Members" />
             <NavItem to="/admin/college/campaigns"    icon={Target}          label="Campaigns" />
+            <NavItem to="/admin/drives"               icon={Briefcase}       label="Placement Drives" />
 
             <SectionLabel label="Community" />
             <NavItem to="/notices"    icon={Bell}          label="Notices" />

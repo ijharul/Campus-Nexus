@@ -74,7 +74,7 @@ export const verifyPayment = async (req, res, next) => {
          expiry.setMonth(now.getMonth() + 1);
       } else if (planId === 'Yearly') {
          user.planName = 'Yearly';
-         user.tokens += 1000;
+         user.tokens += 1500;
          expiry.setFullYear(now.getFullYear() + 1);
       }
       

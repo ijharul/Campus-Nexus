@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../services/api';
+import toast from 'react-hot-toast';
 import { 
   Briefcase, 
   GraduationCap, 
@@ -12,24 +13,26 @@ import {
   Code2,
   Calendar,
   Sparkles,
-  ShieldCheck
+  ShieldCheck,
+  Building2
 } from 'lucide-react';
 
 
 const PublicProfile = () => {
-    const { username } = useParams();
+    const { username, id } = useParams();
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
         fetchProfile();
-    }, [username]);
+    }, [username, id]);
 
     const fetchProfile = async () => {
         try {
             setLoading(true);
-            const { data } = await api.get(`/users/u/${username}`);
+            const endpoint = id ? `/users/${id}` : `/users/u/${username}`;
+            const { data } = await api.get(endpoint);
             setProfile(data);
         } catch (err) {
             setError(err.response?.data?.message || 'Profile visibility restricted.');
@@ -95,11 +98,24 @@ const PublicProfile = () => {
                             </div>
 
                             <h1 className="text-3xl font-black text-slate-900 dark:text-white leading-tight tracking-tight mb-2">{profile.name}</h1>
-                            <p className="text-brand-600 dark:text-brand-400 font-bold text-sm uppercase tracking-widest mb-6">@{profile.username}</p>
+                            {profile.role === 'alumni' && (
+                                <div className="flex justify-center gap-4 mb-6">
+                                    <div className="text-center">
+                                        <div className="text-lg font-black text-sky-500">{profile.impactStats?.studentsHelped || 0}</div>
+                                        <div className="text-[7px] text-slate-500 font-black uppercase tracking-widest">Students Helped</div>
+                                    </div>
+                                    <div className="w-px h-8 bg-slate-100 dark:bg-slate-800 self-center" />
+                                    <div className="text-center">
+                                        <div className="text-lg font-black text-emerald-500">{profile.impactStats?.referralsGiven || 0}</div>
+                                        <div className="text-[7px] text-slate-500 font-black uppercase tracking-widest">Referrals</div>
+                                    </div>
+                                </div>
+                            )}
+                            <p className="text-brand-600 dark:text-brand-400 font-bold text-sm uppercase tracking-widest mb-6">@{profile.username || profile._id.slice(-6)}</p>
                             
                             <div className="flex flex-wrap justify-center gap-2 mb-8">
                                 {profile.badges?.map(badge => (
-                                    <span key={badge} className="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[9px] font-black uppercase tracking-widest rounded-lg border border-slate-200 dark:border-slate-700">{badge}</span>
+                                    <span key={badge} className="px-3 py-1 bg-sky-500/10 text-sky-500 text-[9px] font-black uppercase tracking-widest rounded-lg border border-sky-500/20">{badge}</span>
                                 ))}
                             </div>
 
@@ -112,18 +128,53 @@ const PublicProfile = () => {
                                     <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0"><GraduationCap className="w-4 h-4" /></div>
                                     <span className="text-xs truncate">{profile.collegeId?.name || 'Institutional Member'}</span>
                                 </div>
-                                {profile.location && (
-                                     <div className="flex items-center gap-3 text-slate-600 dark:text-slate-400 font-medium">
-                                        <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0"><MapPin className="w-4 h-4" /></div>
-                                        <span className="text-xs truncate">{profile.location}</span>
-                                    </div>
-                                )}
                             </div>
 
-                            <div className="mt-10 pt-10 border-t border-slate-100 dark:border-slate-800">
-                                <button className="w-full py-4 bg-slate-900 dark:bg-brand-600 text-white font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl shadow-xl transition-all active:scale-95">Send Nexus Message</button>
+                            <div className="mt-10 pt-10 border-t border-slate-100 dark:border-slate-800 space-y-4">
+                                {profile.role === 'alumni' ? (
+                                    <>
+                                        <button 
+                                            onClick={() => toast.success('Mentorship request sent!')}
+                                            className="w-full py-4 bg-sky-500 text-white font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2"
+                                        >
+                                            Request Mentorship
+                                        </button>
+                                        {profile.isPaidMentor && (
+                                            <button 
+                                                onClick={() => {
+                                                    toast.loading('Initializing secure checkout...');
+                                                    setTimeout(() => {
+                                                        toast.dismiss();
+                                                        toast.success(`Premium session with ${profile.name} booked!`);
+                                                    }, 1500);
+                                                }}
+                                                className="w-full py-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl transition-all active:scale-95"
+                                            >
+                                                Book Premium (₹{profile.pricePerSession})
+                                            </button>
+                                        )}
+                                    </>
+                                ) : (
+                                    <button className="w-full py-4 bg-slate-900 dark:bg-brand-600 text-white font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl shadow-xl transition-all active:scale-95">Send Nexus Message</button>
+                                )}
                             </div>
                         </div>
+
+                        {/* Ratings & Testimonials Card */}
+                        {profile.role === 'alumni' && profile.ratings?.length > 0 && (
+                            <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 shadow-xl border border-slate-100 dark:border-slate-800 space-y-6">
+                                <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-widest flex items-center gap-2">
+                                    <Sparkles className="w-4 h-4 text-amber-500" /> Student Success Stories
+                                </h3>
+                                <div className="space-y-4">
+                                    {profile.testimonials?.slice(0, 3).map((t, i) => (
+                                        <div key={i} className="p-4 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-100 dark:border-slate-700">
+                                            <p className="text-xs text-slate-500 dark:text-slate-400 italic font-medium leading-relaxed">"{t.text}"</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
                         {/* Skills Box */}
                         <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 shadow-xl border border-slate-100 dark:border-slate-800">

@@ -10,7 +10,9 @@ import {
   deleteUser,
   requestVerification,
   updateUsername,
-  getPublicProfile
+  getPublicProfile,
+  getPublicProfileById,
+  rateMentor
 } from "../controllers/userController.js";
 import { protect, authorize } from "../middlewares/authMiddleware.js";
 import upload from "../middlewares/uploadMiddleware.js";
@@ -21,6 +23,7 @@ const router = express.Router();
 
 // Public Portfolio Access
 router.get("/u/:username", getPublicProfile);
+router.get("/:id", getPublicProfileById);
 
 // Directory (college-scoped by default, ?global=true for all)
 router.get("/", protect, getUsers);
@@ -35,6 +38,7 @@ router.get(
 
 // View user profile by ID (for directory/profile viewing)
 router.get("/:id/profile", protect, getUserById);
+router.post("/:id/rate", protect, rateMentor);
 
 // Own profile — MUST be before /:id
 router.route("/profile")
@@ -47,9 +51,9 @@ router.post("/verify-request", protect, requestVerification);
 
 // ── Dynamic :id routes LAST ──────────────────────────────────────────────────
 
-// Admin: get single user
+// Admin: get single user (renamed for clarity if needed, but keeping pattern)
 router.get(
-  "/:id",
+  "/admin/:id",
   protect,
   authorize("collegeAdmin", "superAdmin"),
   getUserById,

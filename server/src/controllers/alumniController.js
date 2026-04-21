@@ -10,14 +10,17 @@ export const getAlumniStats = async (req, res, next) => {
   try {
     const alumniId = req.user._id;
 
-    const [mentorshipsGiven, referralsDone] = await Promise.all([
+    const [mentorshipsGiven, referralsDone, user] = await Promise.all([
       Mentorship.countDocuments({ mentor: alumniId, status: 'completed' }),
-      Referral.countDocuments({ alumni: alumniId, status: 'referred' })
+      Referral.countDocuments({ alumni: alumniId, status: 'referred' }),
+      User.findById(alumniId).select('impactStats badges')
     ]);
 
     res.json({
       mentorshipsGiven,
-      referralsDone
+      referralsDone,
+      impactStats: user.impactStats,
+      badges: user.badges
     });
   } catch (error) { next(error); }
 };

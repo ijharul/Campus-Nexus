@@ -4,6 +4,7 @@ import User from '../models/User.js';
 import Mentorship from '../models/Mentorship.js';
 import { createNotify } from '../utils/notification.js';
 import { getIO } from '../services/socketService.js';
+import ActivityLog from '../models/ActivityLog.js';
 
 /**
  * @desc    Send a chat request (Student -> Alumni)
@@ -35,6 +36,14 @@ export const sendChatRequest = async (req, res, next) => {
       message: `${req.user.name} sent you a chat request.`,
       link: '/chat'
     });
+
+    // Log activity
+    ActivityLog.create({
+      user: senderId,
+      action: 'chat_message',
+      details: { receiverId },
+      collegeId: req.user.collegeId || null,
+    }).catch(() => {}); // non-blocking
 
     res.status(201).json(request);
   } catch (error) { next(error); }

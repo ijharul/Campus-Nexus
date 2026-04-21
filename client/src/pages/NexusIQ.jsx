@@ -100,7 +100,15 @@ export default function NexusIQ() {
       setter(data);
       toast.success('Analysis complete!');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'AI request failed.');
+      const isApiKeyError = err.response?.status === 500 || err.response?.status === 401 || err.response?.status === 403;
+      const errorMsg = isApiKeyError 
+        ? "AI Engine is currently offline (API key unavailable). System update in progress — please try again later."
+        : (err.response?.data?.message || 'AI request failed.');
+      
+      toast.error(errorMsg, {
+        duration: 5000,
+        icon: '⚠️'
+      });
     } finally {
       setLoading(false);
     }

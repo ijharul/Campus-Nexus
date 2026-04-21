@@ -9,6 +9,18 @@ import {
   TrendingUp, Star
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { 
+  AreaChart, 
+  Area, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  Cell
+} from 'recharts';
 
 const StatCard = ({ label, value, icon: Icon, color = 'sky', description }) => {
   const colors = {
@@ -67,13 +79,18 @@ const ToolCard = ({ to, icon: Icon, title, description, color = 'sky' }) => (
 const StudentDashboard = () => {
   const { user } = useContext(AuthContext);
   const [stats, setStats] = useState(null);
+  const [activityData, setActivityData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const s = await api.get('/student/stats');
-        setStats(s.data);
+        const [statsRes, activityRes] = await Promise.all([
+          api.get('/student/stats'),
+          api.get('/activity/weekly')
+        ]);
+        setStats(statsRes.data);
+        setActivityData(activityRes.data.dailyBreakdown || []);
       } catch {
         toast.error('Unable to synchronize hub data.');
       } finally {
@@ -114,12 +131,10 @@ const StudentDashboard = () => {
             </span>
           </div>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tighter leading-none">
-            Welcome Back, <span className="gradient-text-sky">{firstName}</span>
+            Welcome, <span className="gradient-text-sky">{firstName}</span>
           </h1>
-          <p className="text-slate-500 dark:text-slate-400 font-medium text-base max-w-lg leading-relaxed">
-            Profile Strength:{' '}
-            <span className="text-sky-500 font-bold">{profilePercent}%</span>.
-            Connect with elite alumni and unlock your career roadmap.
+          <p className="text-slate-500 dark:text-slate-400 font-medium text-base leading-relaxed">
+            Profile Strength: <span className="text-sky-500 font-bold">{profilePercent}%</span>. Connect with elite alumni and unlock your career roadmap.
           </p>
         </div>
 
@@ -217,6 +232,7 @@ const StudentDashboard = () => {
           </div>
         </Link>
       </div>
+
 
       {/* ── Elite Toolkit ── */}
       <div className="space-y-8">

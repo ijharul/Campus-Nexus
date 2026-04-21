@@ -22,6 +22,9 @@ import superAdminRoutes from "./routes/superAdminRoutes.js";
 import noticeRoutes from "./routes/noticeRoutes.js";
 import goalRoutes from "./routes/goalRoutes.js";
 import gamificationRoutes from "./routes/gamificationRoutes.js";
+import activityRoutes from "./routes/activityRoutes.js";
+import driveRoutes from "./routes/driveRoutes.js";
+import searchRoutes from "./routes/searchRoutes.js";
 import http from "http";
 import { initSocket } from "./services/socketService.js";
 
@@ -64,6 +67,9 @@ app.use("/api/super", superAdminRoutes);
 app.use("/api/notices", noticeRoutes);
 app.use("/api/goals", goalRoutes);
 app.use("/api/gamification", gamificationRoutes);
+app.use("/api/activity", activityRoutes);
+app.use("/api/drives", driveRoutes);
+app.use("/api/search", searchRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

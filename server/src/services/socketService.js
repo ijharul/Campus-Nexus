@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import Message from '../models/Message.js';
 import { createNotify } from '../utils/notification.js';
+import ActivityLog from '../models/ActivityLog.js';
 
 let io;
 const userSocketMap = new Map(); // userId -> socketId
@@ -99,6 +100,14 @@ export const initSocket = (server) => {
             link: '/chat'
           });
         }
+
+        // Log chat activity (non-blocking)
+        ActivityLog.create({
+          user: userId,
+          action: 'chat_message',
+          details: { groupId: groupId || null, receiverId: receiverId || null },
+          collegeId: socket.user.collegeId || null,
+        }).catch(() => {});
       } catch (err) {
         console.error('Error sending message:', err);
       }

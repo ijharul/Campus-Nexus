@@ -120,7 +120,7 @@ const AlumniDashboard = () => {
       </div>
 
       {/* ── TIER 1: Global Stats Row ── */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <StatCard icon={Award} label="Guidance Provided" value={stats?.mentorshipsGiven || 0} color="sky" />
         <StatCard icon={TrendingUp} label="Referrals Done" value={stats?.referralsDone || 0} color="emerald" />
         <div className="glass-card p-6 border border-white/5 bg-slate-900/40">
@@ -132,6 +132,47 @@ const AlumniDashboard = () => {
            </div>
            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Legacy Giving</p>
            <h3 className="text-4xl font-black text-white tracking-tighter">₹{totalImpact.toLocaleString()}</h3>
+        </div>
+        <div className="glass-card p-6 border border-white/5 bg-indigo-500/5">
+           <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-3">Community Recognition</p>
+           <div className="flex flex-wrap gap-2">
+              {stats?.badges?.length > 0 ? stats.badges.map(b => (
+                <span key={b} className="px-2 py-1 bg-indigo-500/10 border border-indigo-500/20 text-[8px] font-black text-indigo-400 uppercase tracking-widest rounded-lg">
+                  {b}
+                </span>
+              )) : <span className="text-[10px] font-bold text-slate-600 italic">No badges earned yet</span>}
+           </div>
+        </div>
+      </div>
+
+      {/* ── NEW: IMPACT METRICS ROW ── */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="p-6 rounded-[2rem] bg-slate-900/40 border border-white/5 flex items-center gap-5">
+           <div className="w-12 h-12 rounded-2xl bg-sky-500/10 flex items-center justify-center text-sky-400 border border-sky-500/20">
+              <Users className="w-6 h-6" />
+           </div>
+           <div>
+              <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Students Helped</p>
+              <p className="text-2xl font-black text-white">{stats?.impactStats?.studentsHelped || 0}</p>
+           </div>
+        </div>
+        <div className="p-6 rounded-[2rem] bg-slate-900/40 border border-white/5 flex items-center gap-5">
+           <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 border border-emerald-500/20">
+              <Briefcase className="w-6 h-6" />
+           </div>
+           <div>
+              <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Referrals Provided</p>
+              <p className="text-2xl font-black text-white">{stats?.impactStats?.referralsGiven || 0}</p>
+           </div>
+        </div>
+        <div className="p-6 rounded-[2rem] bg-slate-900/40 border border-white/5 flex items-center gap-5">
+           <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-400 border border-amber-500/20">
+              <Award className="w-6 h-6" />
+           </div>
+           <div>
+              <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Placements Secured</p>
+              <p className="text-2xl font-black text-white">{stats?.impactStats?.successfulPlacements || 0}</p>
+           </div>
         </div>
       </div>
 

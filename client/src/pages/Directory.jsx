@@ -43,6 +43,17 @@ const UserCard = ({ person, onMentorshipRequest, onChatRequest, onReport, onProf
           </span>
         </div>
 
+        {/* Badges for Alumni */}
+        {isAlumni && person.badges?.length > 0 && (
+          <div className="flex flex-wrap gap-1 mb-3">
+            {person.badges.slice(0, 2).map(b => (
+              <span key={b} className="px-2 py-0.5 bg-indigo-500/10 border border-indigo-500/20 text-[7px] font-black text-indigo-400 uppercase tracking-widest rounded">
+                {b}
+              </span>
+            ))}
+          </div>
+        )}
+
         {/* Name & role */}
         <h3 className="text-lg font-black text-white tracking-tight leading-tight mb-1">
           {person.name}
@@ -218,7 +229,7 @@ const Directory = () => {
     }
   };
 
-  const handleProfileView = (userId) => navigate(`/profile/${userId}`);
+  const handleProfileView = (userId) => navigate(`/alumni/${userId}`);
 
   return (
     <div className="space-y-10 pb-20 animate-in fade-in slide-in-from-bottom-6 duration-700">
@@ -286,6 +297,7 @@ const Directory = () => {
                 <option value="" className="bg-slate-900">All Members</option>
                 <option value="alumni" className="bg-slate-900">Alumni</option>
                 <option value="student" className="bg-slate-900">Students</option>
+                <option value="top_mentors" className="bg-slate-900">Top Mentors</option>
               </select>
             </div>
           )}
@@ -383,6 +395,35 @@ const Directory = () => {
           </div>
         )}
       </div>
+
+      {/* ── Professionals Like You (Alumni Only) ── */}
+      {user?.role === 'alumni' && users.filter(u => u.role === 'alumni' && u.company === user.company).length > 0 && (
+        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+          <div className="flex items-center gap-3">
+             <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-500">
+                <Building2 className="w-5 h-5" />
+             </div>
+             <h3 className="text-xl font-black text-white tracking-tight">Professionals from {user.company}</h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+             {users.filter(u => u.role === 'alumni' && u.company === user.company).slice(0, 4).map(person => (
+               <div 
+                  key={person._id} 
+                  onClick={() => handleProfileView(person._id)}
+                  className="p-4 bg-slate-900/60 border border-white/5 rounded-2xl flex items-center gap-4 hover:border-indigo-500/30 transition-all cursor-pointer group"
+               >
+                  <div className="w-10 h-10 rounded-xl bg-white/5 overflow-hidden border border-white/10 shrink-0">
+                    {person.profilePicture ? <img src={person.profilePicture} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-indigo-400 font-bold">{person.name[0]}</div>}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-white truncate">{person.name}</p>
+                    <p className="text-[10px] text-slate-500 font-medium truncate">{person.currentRole}</p>
+                  </div>
+               </div>
+             ))}
+          </div>
+        </div>
+      )}
 
       {/* ── Nexus AI Banner - Only show for Students ── */}
       {user?.role === 'student' && (

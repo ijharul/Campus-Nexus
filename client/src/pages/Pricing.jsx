@@ -130,7 +130,7 @@ const RestrictedView = ({ role }) => (
 /* ── Main Pricing Component ─────────────────────────────────────────────── */
 const Pricing = () => {
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
+  const { user, setUser } = useContext(AuthContext);
   const [loading, setLoading] = useState(null);
   const [hoveredPlan, setHoveredPlan] = useState(null);
 
@@ -158,16 +158,31 @@ const Pricing = () => {
         handler: async (response) => {
           toast.success('Payment received. Verifying...');
           try {
-            await api.post('/payment/verify', {
+            const { data } = await api.post('/payment/verify', {
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_order_id:   response.razorpay_order_id,
               razorpay_signature:  response.razorpay_signature,
               planId,
             });
+            
+            // Sync user data with AuthContext & LocalStorage
+            if (data.tokens !== undefined) {
+              const updatedUser = { 
+                ...user, 
+                tokens: data.tokens, 
+                planName: data.planName || planId,
+                planStatus: 'active'
+              };
+              setUser(updatedUser);
+              localStorage.setItem('user', JSON.stringify(updatedUser));
+            }
+
             toast.success(`${planId} Plan activated! 🎉`);
-            window.location.href = '/';
-          } catch {
-            toast.error('Payment verification failed. Contact support.');
+            setTimeout(() => {
+              window.location.href = '/';
+            }, 1500);
+          } catch (err) {
+            toast.error(err.response?.data?.message || 'Payment verification failed. Contact support.');
           }
         },
         theme: { color: '#0ea5e9' },
