@@ -380,3 +380,88 @@
   background-size: 200% 100%;
   animation: shimmerMove 2s linear infinite;
 }
+
+/* ── Mobile Responsiveness (Max-width: 768px) ────────────────────────── */
+@media (max-width: 768px) {
+  :root {
+    font-size: 14px; /* Scaling down for smaller screens */
+  }
+
+  body {
+    overflow-y: auto !important; /* Allow body scroll on mobile if needed */
+  }
+
+  /* ── Mobile Layout Fixes ── */
+  .max-w-7xl, .max-w-\[1600px\] {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  /* ── Mobile Typography ── */
+  h1 { font-size: 2.5rem !important; line-height: 1.1 !important; }
+  h2 { font-size: 2rem !important; }
+  h3 { font-size: 1.5rem !important; }
+
+  /* ── Mobile Dashboard Grids ── */
+  .grid-cols-2, .grid-cols-3, .grid-cols-4, .lg\:grid-cols-12 {
+    grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+  }
+
+  /* Stat cards should stack */
+  .sm\:grid-cols-2 {
+    grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+  }
+
+  /* ── Card Adjustments ── */
+  .pristine-card, .glass-card {
+    padding: 1.5rem !important;
+    border-radius: 1.25rem !important;
+  }
+
+  /* ── Modal Handling ── */
+  .fixed.inset-0 {
+    padding: 1rem !important;
+  }
+
+  .w-full.max-w-2xl, .w-full.max-w-4xl {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  /* ── Table Responsiveness ── */
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* ── Utility ── */
+  .hide-on-mobile {
+    display: none !important;
+  }
+
+  .show-on-mobile {
+    display: block !important;
+  }
+}
+
+/* ── Extra Small Screens (Max-width: 480px) ────────────────────────── */
+@media (max-width: 480px) {
+  .btn-primary, .btn-secondary, .btn-premium {
+    width: 100%; /* Full width buttons on very small screens */
+    padding: 1rem !important;
+  }
+
+  .flex-row {
+    flex-direction: column !important;
+  }
+
+  .items-end {
+    items-center !important;
+  }
+
+  .text-6xl {
+    font-size: 3rem !important;
+  }
+}

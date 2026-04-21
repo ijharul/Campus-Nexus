@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
+import { useContext } from 'react';
+import { AuthContext } from '../contexts/AuthContext';
 import Sidebar from './Sidebar';
 import NotificationCenter from './NotificationCenter';
 import SearchBox from './SearchBox';
@@ -7,6 +9,7 @@ import { Menu, X, Search, Zap } from 'lucide-react';
 
 const DashboardLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { user } = useContext(AuthContext);
   const location = useLocation();
 
   // Close sidebar automatically on mobile when route changes
@@ -25,24 +28,29 @@ const DashboardLayout = () => {
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
         
         {/* Mobile Header - Visible only on small screens */}
-        <header className="lg:hidden flex items-center justify-between px-6 py-4 border-b border-white/10 backdrop-blur-xl bg-slate-950/20 z-20">
+        <header className="lg:hidden flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-white/5 backdrop-blur-xl bg-white/70 dark:bg-slate-950/20 z-20">
           <div className="flex items-center gap-3">
-             <div className="w-8 h-8 bg-sky-500 rounded-lg flex items-center justify-center shadow-lg shadow-sky-500/20">
-                <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5 text-white" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 4L4 8L12 12L20 8L12 4Z" fill="currentColor" />
-                  <path d="M4 12L12 16L20 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-             </div>
-             <span className="text-sm font-bold text-slate-900 dark:text-white tracking-tight uppercase">Campus Nexus</span>
+             <button 
+               onClick={() => setIsSidebarOpen(true)}
+               className="p-2 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400"
+             >
+               <Menu className="w-5 h-5" />
+             </button>
+             <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-tighter">Nexus Hub</span>
           </div>
 
-          <button 
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="p-2 rounded-xl bg-white/5 border border-white/10 text-slate-600 dark:text-slate-400 hover:text-sky-500 transition-all active:scale-95"
-          >
-            {isSidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          <div className="flex items-center gap-3">
+             <NotificationCenter />
+             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-sky-400 to-indigo-600 flex items-center justify-center text-[10px] font-black text-white shadow-lg shadow-sky-500/20">
+               {user?.name?.[0].toUpperCase()}
+             </div>
+          </div>
         </header>
+
+        {/* Mobile Search Bar - Visible only on small screens */}
+        <div className="lg:hidden px-4 py-3 border-b border-slate-200 dark:border-white/5 bg-white/30 dark:bg-slate-950/10 backdrop-blur-sm">
+           <SearchBox />
+        </div>
 
         {/* ── Top Utility Bar (Desktop) ── */}
         <header className="hidden lg:flex items-center justify-between px-8 py-4 border-b border-white/[0.06] backdrop-blur-md bg-slate-950/10 z-10">

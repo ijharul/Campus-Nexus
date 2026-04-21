@@ -10,3 +10,7 @@ build
 
 # logs
 npm-debug.log
+
+# temporary
+scratch/
+render.yaml
