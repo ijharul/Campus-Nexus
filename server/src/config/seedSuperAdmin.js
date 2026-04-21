@@ -10,7 +10,7 @@ const seedSuperAdmin = async () => {
     // Check if any admin exists
     const existing = await User.findOne({ role: "superAdmin" });
     if (existing) {
-      console.log("✅ Test users already exist — skipping seed.");
+      console.log("Test users already exist — skipping seed.");
       return;
     }
 
@@ -74,7 +74,7 @@ const seedSuperAdmin = async () => {
     console.log("   🎓 Alumni: alumni@example.com / Alumni@123");
     console.log("   🏫 College Admin: admin@college.com / Admin@123");
   } catch (err) {
-    console.error("❌ Seed error:", err.message);
+    console.error("Seed error:", err.message);
   }
 };
 
