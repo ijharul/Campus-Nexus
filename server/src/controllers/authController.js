@@ -61,13 +61,14 @@ export const registerUser = async (req, res, next) => {
     const allowedSelfRoles = ["student", "alumni"];
     const finalRole = allowedSelfRoles.includes(role) ? role : "student";
 
+    const isOther = collegeId === 'other' || !collegeId;
     const userData = {
       name,
       email,
       password,
       role: finalRole,
-      collegeId: collegeId || null,
-      pendingCollege: collegeId ? "" : pendingCollege || "",
+      collegeId: isOther ? null : collegeId,
+      pendingCollege: isOther ? pendingCollege || "" : "",
     };
 
     // Set batch for alumni
