@@ -78,6 +78,17 @@ export default function Chat() {
       setRequests(rawReqs.filter(r => r && r.status === "pending" && r.receiver?._id === user._id));
       const cId = user.collegeId?._id || user.collegeId;
       const roomsList = [];
+      
+      // Always add Global Nexus Hub for everyone
+      roomsList.push({ 
+        id: `global_hub`, 
+        name: "Global Nexus Hub", 
+        description: "Community & Support", 
+        groupId: `global_community`, 
+        type: "group", 
+        icon: Zap 
+      });
+
       if (cId) {
         roomsList.push({ id: `general`, name: "Campus Hub", description: "Open discussion", groupId: `${cId}_general`, type: "group", icon: Users });
         if (role === "alumni" || role === "collegeadmin") roomsList.push({ id: `alumni_network`, name: "Alumni Circle", description: "Graduates only", groupId: `${cId}_alumni`, type: "group", icon: ShieldCheck });

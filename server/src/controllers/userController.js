@@ -36,6 +36,8 @@ const userPayload = (u) => ({
   careerGoal: u.careerGoal,
   profilePicture: u.profilePicture,
   resume: u.resume,
+  isPaidMentor: u.isPaidMentor,
+  pricePerSession: u.pricePerSession,
 });
 
 /** GET /api/users/profile */
@@ -84,7 +86,8 @@ export const updateUserProfile = async (req, res, next) => {
       }
     }
 
-    const updated = await user.save();
+    await user.save();
+    const updated = await User.findById(user._id).populate('collegeId', 'name location');
     res.json(userPayload(updated));
   } catch (error) { next(error); }
 };
