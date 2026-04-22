@@ -12,10 +12,8 @@ export const createNotify = async (data) => {
       .populate('sender', 'name profilePicture');
 
     const io = getIO();
-    // Emit to specific user's room (using their userId as room name)
-    // socketService already maps userId to sockets, but we can also just use io.to(recipientId)
-    // if we make users join their own ID room on connect.
-    io.emit(`notification_${data.recipient}`, populated);
+    // Emit specifically to the recipient's personal room for privacy and performance
+    io.to(data.recipient.toString()).emit(`notification_${data.recipient}`, populated);
     
     return populated;
   } catch (err) {

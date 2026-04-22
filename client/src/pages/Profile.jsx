@@ -511,7 +511,7 @@ const Profile = () => {
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => handleAddArrayItem("socialLinks", { platform: "LinkedIn", url: "" })}
+                  onClick={() => handleAddArrayItem("socialLinks", { platform: "", url: "" })}
                   className="!rounded-xl px-4 font-bold border-white/10 text-slate-300 hover:text-white"
                 >
                   <Plus className="h-4 w-4 mr-2" /> Add Link
@@ -527,6 +527,7 @@ const Profile = () => {
                           onChange={(e) => handleArrayChange("socialLinks", index, "platform", e.target.value)}
                           className="bg-slate-900 text-[10px] font-black uppercase tracking-widest text-sky-500 border border-white/10 rounded-lg px-2 py-1 focus:ring-1 focus:ring-sky-500/50 outline-none cursor-pointer appearance-none"
                        >
+                          <option value="" disabled className="bg-slate-900">Select Link</option>
                           <option value="LinkedIn" className="bg-slate-900">LinkedIn</option>
                           <option value="GitHub" className="bg-slate-900">GitHub</option>
                           <option value="Twitter" className="bg-slate-900">Twitter</option>

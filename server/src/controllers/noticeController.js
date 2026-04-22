@@ -1,4 +1,6 @@
 import Notice from '../models/Notice.js';
+import User from '../models/User.js';
+import { createNotify } from '../utils/notification.js';
 
 /**
  * @desc    Get all notices for the requester's college
@@ -39,6 +41,28 @@ export const createNotice = async (req, res, next) => {
     });
 
     res.status(201).json(notice);
+
+    // Notify all users in the college (Background)
+    (async () => {
+      try {
+        const usersToNotify = await User.find({ 
+          collegeId: req.user.collegeId, 
+          _id: { $ne: req.user._id } 
+        }).select('_id');
+
+        for (const targetUser of usersToNotify) {
+          await createNotify({
+            recipient: targetUser._id,
+            sender: req.user._id,
+            type: 'message',
+            message: `New notice: ${title}`,
+            link: '/notices'
+          });
+        }
+      } catch (err) {
+        console.error('Mass notification failed:', err);
+      }
+    })();
   } catch (error) { next(error); }
 };
 

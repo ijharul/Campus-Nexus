@@ -1,5 +1,6 @@
 import College from "../models/College.js";
 import User from "../models/User.js";
+import { createNotify } from "../utils/notification.js";
 
 /**
  * @desc    Create a college (superAdmin only)
@@ -202,6 +203,15 @@ export const assignCollegeAdmin = async (req, res, next) => {
     // Store adminId on college for quick reference
     college.adminId = user._id;
     await college.save();
+
+    // Notify User
+    await createNotify({
+      recipient: user._id,
+      sender: req.user._id,
+      type: 'request_accepted',
+      message: `You have been assigned as the College Admin for ${college.name}.`,
+      link: '/admin/college'
+    });
 
     res.json({
       message: `${user.name} is now collegeAdmin for ${college.name}.`,

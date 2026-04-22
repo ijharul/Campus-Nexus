@@ -8,14 +8,9 @@ import User from '../models/User.js';
 export const getAlumniLeaderboard = async (req, res, next) => {
   try {
     const { collegeId } = req.user;
-    if (!collegeId) {
-       return res.json([]);
-    }
+    const query = collegeId ? { collegeId, role: 'alumni' } : { role: 'alumni' };
 
-    const leaderboard = await User.find({ 
-      collegeId, 
-      role: 'alumni'
-    })
+    const leaderboard = await User.find(query)
       .sort({ contributionScore: -1 })
       .limit(10)
       .select('name profilePicture contributionScore badges currentRole company');
@@ -34,14 +29,9 @@ export const getAlumniLeaderboard = async (req, res, next) => {
 export const getStudentLeaderboard = async (req, res, next) => {
   try {
     const { collegeId } = req.user;
-    if (!collegeId) {
-       return res.json([]);
-    }
+    const query = collegeId ? { collegeId, role: 'student' } : { role: 'student' };
 
-    const leaderboard = await User.find({ 
-      collegeId, 
-      role: 'student'
-    })
+    const leaderboard = await User.find(query)
       .sort({ contributionScore: -1 })
       .limit(10)
       .select('name profilePicture contributionScore badges branch year');
@@ -63,11 +53,11 @@ export const getMyStats = async (req, res, next) => {
       .select('contributionScore badges verificationStatus aiCallsToday tokens');
     
     // Calculate rank within the college (only if collegeId exists)
-    const rank = req.user.collegeId ? await User.countDocuments({
-      collegeId: req.user.collegeId,
-      role: req.user.role,
-      contributionScore: { $gt: user.contributionScore }
-    }) + 1 : 1;
+    const rankQuery = req.user.collegeId 
+      ? { collegeId: req.user.collegeId, role: req.user.role, contributionScore: { $gt: user.contributionScore } }
+      : { role: req.user.role, contributionScore: { $gt: user.contributionScore } };
+
+    const rank = await User.countDocuments(rankQuery) + 1;
 
     res.json({ ...user._doc, rank });
   } catch (error) {

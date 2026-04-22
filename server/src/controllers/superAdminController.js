@@ -2,6 +2,7 @@ import CollegeRequest from '../models/CollegeRequest.js';
 import College from '../models/College.js';
 import User from '../models/User.js';
 import { sendApprovalNotification } from '../utils/emailService.js';
+import { createNotify } from '../utils/notification.js';
 
 /**
  * @desc    Get all pending college requests
@@ -64,6 +65,15 @@ export const approveCollegeRequest = async (req, res, next) => {
       collegeName: request.collegeName
     });
 
+    // Real-time Notification
+    await createNotify({
+      recipient: request.requester._id,
+      sender: req.user._id,
+      type: 'request_accepted',
+      message: `Congratulations! ${request.collegeName} has been onboarded and you are now a member.`,
+      link: '/profile'
+    });
+
     res.json({ message: 'College approved and created successfully', college });
   } catch (error) { next(error); }
 };
@@ -84,6 +94,15 @@ export const rejectCollegeRequest = async (req, res, next) => {
     request.status = 'rejected';
     request.adminNotes = req.body.reason || 'Not eligible';
     await request.save();
+
+    // Real-time Notification
+    await createNotify({
+      recipient: request.requester,
+      sender: req.user._id,
+      type: 'request_rejected',
+      message: `Your request to onboard ${request.collegeName} was declined.`,
+      link: '/profile'
+    });
 
     res.json({ message: 'Request rejected' });
   } catch (error) { next(error); }

@@ -114,7 +114,7 @@ const Notices = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isAlumni = user?.role === 'alumni';
-  const canPost = user?.role === 'alumni' || user?.role === 'collegeAdmin';
+  const canPost = (user?.role === 'alumni' && user?.verificationStatus === 'verified') || ['collegeAdmin', 'superAdmin'].includes(user?.role);
 
   const fetchNotices = async () => {
     try {

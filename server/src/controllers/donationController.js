@@ -3,6 +3,8 @@ import Campaign from '../models/Campaign.js';
 import User from '../models/User.js';
 import Razorpay from 'razorpay';
 import crypto from 'crypto';
+import College from '../models/College.js';
+import { createNotify } from '../utils/notification.js';
 /**
  * @desc    Create Razorpay Order for Donation
  * @route   POST /api/donations/create-order
@@ -67,6 +69,18 @@ export const verifyDonation = async (req, res, next) => {
     if (campaignId) {
       await Campaign.findByIdAndUpdate(campaignId, {
         $inc: { raisedAmount: amount }
+      });
+    }
+
+    // Notify College Admin
+    const college = await College.findById(collegeId);
+    if (college && college.adminId) {
+      await createNotify({
+        recipient: college.adminId,
+        sender: donorId,
+        type: 'donation',
+        message: `${req.user.name} donated ₹${amount} to your college.`,
+        link: '/admin/college/campaigns'
       });
     }
 

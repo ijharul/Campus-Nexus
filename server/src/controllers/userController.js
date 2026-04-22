@@ -1,6 +1,7 @@
 import User from '../models/User.js';
 import cloudinary from '../config/cloudinary.js';
 import streamifier from 'streamifier';
+import { createNotify } from '../utils/notification.js';
 
 const streamUploadToCloudinary = (buffer, options) =>
   new Promise((resolve, reject) => {
@@ -158,6 +159,15 @@ export const approveAlumni = async (req, res, next) => {
     user.isApproved = !!approved;
     await user.save();
 
+    // Notify Alumni
+    await createNotify({
+      recipient: user._id,
+      sender: req.user._id,
+      type: approved ? 'request_accepted' : 'request_rejected',
+      message: `Your alumni status was ${approved ? 'approved' : 'rejected'} by your institution.`,
+      link: '/profile'
+    });
+
     res.json({
       message: `Alumni ${approved ? 'approved' : 'rejected'} successfully.`,
       user: { _id: user._id, name: user.name, email: user.email, isApproved: user.isApproved },
@@ -245,6 +255,25 @@ export const requestVerification = async (req, res, next) => {
     };
     
     await user.save();
+
+    // Notify Super Admin (Background)
+    (async () => {
+      try {
+        const superAdmins = await User.find({ role: 'superAdmin' }).select('_id');
+        for (const admin of superAdmins) {
+          await createNotify({
+            recipient: admin._id,
+            sender: user._id,
+            type: 'message',
+            message: `New Institution Onboarding: ${user.pendingCollege || (user.collegeId ? 'Institutional Update' : 'Unknown')}`,
+            link: '/admin/super/requests'
+          });
+        }
+      } catch (err) {
+        console.error('Super admin notification failed:', err);
+      }
+    })();
+
     res.json({ message: 'Verification request submitted. Platform administrators will review your institution.', status: 'pending' });
   } catch (error) { next(error); }
 };
