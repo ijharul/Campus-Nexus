@@ -11,6 +11,10 @@ const streamUploadToCloudinary = (buffer, options) =>
   });
 
 const userPayload = (u) => ({
+  _id: u._id,
+  name: u.name,
+  email: u.email,
+  role: u.role,
   username: u.username,
   contributionScore: u.contributionScore,
   badges: u.badges,
@@ -20,7 +24,7 @@ const userPayload = (u) => ({
   bio: u.bio,
   skills: u.skills,
   company: u.company,
-  // ... rest of fields
+  collegeId: u.collegeId, // Populated object or ID
   college: u.college,
   currentRole: u.currentRole,
   experience: u.experience,
@@ -227,18 +231,18 @@ export const requestVerification = async (req, res, next) => {
     const { graduationYear } = req.body;
     const user = await User.findById(req.user._id);
 
-    if (!user.collegeId) {
-      res.status(400); throw new Error('Please select an institution first.');
+    if (!user.collegeId && !user.pendingCollege) {
+      res.status(400); throw new Error('Please specify your institution name in profile first.');
     }
 
     user.verificationStatus = 'pending';
     user.verificationDetails = { 
        graduationYear,
-       college: user.college // Legacy or text fallback
+       college: user.collegeId ? 'institutional' : (user.pendingCollege || user.college)
     };
     
     await user.save();
-    res.json({ message: 'Verification request submitted to your college administrator.', status: 'pending' });
+    res.json({ message: 'Verification request submitted. Platform administrators will review your institution.', status: 'pending' });
   } catch (error) { next(error); }
 };
 

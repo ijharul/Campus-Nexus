@@ -224,7 +224,7 @@ const StudentDashboard = () => {
           </div>
           <div className="relative z-10">
             <p className="text-[10px] font-black text-sky-400 uppercase tracking-widest mb-1">Current Plan</p>
-            <h4 className="text-2xl font-black text-white tracking-tight">{user?.planName || 'Standard'}</h4>
+            <h4 className="text-2xl font-black text-white tracking-tight">{(user?.planName === 'none' || !user?.planName) ? 'Free' : user.planName}</h4>
             <p className="text-[10px] font-bold text-sky-500/70 uppercase tracking-widest mt-1">Institutional Access</p>
           </div>
           <div className="mt-4 relative z-10 text-[10px] font-black text-sky-400 uppercase tracking-widest flex items-center gap-1 group-hover:gap-3 transition-all">
