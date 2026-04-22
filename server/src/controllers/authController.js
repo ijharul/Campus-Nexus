@@ -167,7 +167,8 @@ export const forgotPassword = async (req, res, next) => {
     await user.save({ validateBeforeSave: false });
 
     // Create reset url
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+    const frontendUrl = (process.env.FRONTEND_URL || "https://campus-nexus-ten.vercel.app").replace(/\/$/, "");
+    const resetUrl = `${frontendUrl}/reset-password/${resetToken}`;
 
     try {
       await sendPasswordResetEmail({
