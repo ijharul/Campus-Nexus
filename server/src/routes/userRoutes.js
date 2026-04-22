@@ -27,6 +27,15 @@ router.get(
   getAllUsers,
 );
 
+// Own profile — MUST be before any dynamic /:id routes
+router.route("/profile")
+  .get(protect, getUserProfile)
+  .put(protect, upload.single("file"), updateUserProfile);
+
+// Professional Identity & Verification
+router.put("/username", protect, updateUsername);
+router.post("/verify-request", protect, requestVerification);
+
 // Directory (college-scoped by default, ?global=true for all)
 router.get("/", protect, getUsers);
 
@@ -37,15 +46,6 @@ router.get("/:id", getPublicProfileById);
 // View user profile by ID (for directory/profile viewing)
 router.get("/:id/profile", protect, getUserById);
 router.post("/:id/rate", protect, rateMentor);
-
-// Own profile — MUST be before /:id
-router.route("/profile")
-  .get(protect, getUserProfile)
-  .put(protect, upload.single("file"), updateUserProfile);
-
-// Professional Identity & Verification
-router.put("/username", protect, updateUsername);
-router.post("/verify-request", protect, requestVerification);
 
 // ── Dynamic :id routes LAST ──────────────────────────────────────────────────
 
