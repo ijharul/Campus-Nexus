@@ -322,7 +322,7 @@ const AlumniDashboard = () => {
                         <div className="bg-white h-full" style={{width: `${(liveCampaign.raisedAmount / liveCampaign.goalAmount) * 100}%`}} />
                      </div>
                   </div>
-                  <Link to="/alumni/donations" className="block w-full py-3 bg-white text-rose-500 text-[10px] font-black uppercase tracking-widest text-center rounded-xl shadow-xl">
+                  <Link to={`/alumni/donations?campaignId=${liveCampaign._id}`} className="block w-full py-3 bg-white text-rose-500 text-[10px] font-black uppercase tracking-widest text-center rounded-xl shadow-xl">
                      Support Project
                   </Link>
                </div>

@@ -22,8 +22,17 @@ const AlumniDonations = () => {
         api.get('/college-admin/campaigns'),
         api.get('/donations/my')
       ]);
-      setCampaigns(c.data.filter(camp => camp.isActive));
+      const activeCamps = c.data.filter(camp => camp.isActive !== false);
+      setCampaigns(activeCamps);
       setMyDonations(d.data);
+
+      // Handle deep linking from dashboard
+      const params = new URLSearchParams(window.location.search);
+      const campId = params.get('campaignId');
+      if (campId) {
+        const found = activeCamps.find(ac => ac._id === campId);
+        if (found) setSelectedCampaign(found);
+      }
     } catch {
       toast.error('Failed to sync donation ecosystem.');
     } finally {
