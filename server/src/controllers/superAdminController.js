@@ -91,11 +91,17 @@ export const rejectCollegeRequest = async (req, res, next) => {
       throw new Error('Request not found');
     }
 
+    // 1. Update Request status
     request.status = 'rejected';
     request.adminNotes = req.body.reason || 'Not eligible';
     await request.save();
 
-    // Real-time Notification
+    // 2. Clear the requester's pendingCollege status so dashboard counts update correctly
+    await User.findByIdAndUpdate(request.requester, {
+      pendingCollege: '',
+    });
+
+    // 3. Real-time Notification
     await createNotify({
       recipient: request.requester,
       sender: req.user._id,

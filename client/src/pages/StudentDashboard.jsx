@@ -291,7 +291,9 @@ const StudentDashboard = () => {
               { icon: Map,          l: 'Master Roadmap',      t: '5 Tokens' },
               { icon: GraduationCap, l: 'Competency Mapping', t: '5 Tokens' },
             ].map(x => (
-              <div key={x.l}
+              <Link
+                key={x.l}
+                to="/ai"
                 className="flex items-center justify-between p-6 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 hover:border-sky-500/30 transition-all group cursor-pointer"
               >
                 <div className="flex items-center gap-5">
@@ -303,7 +305,7 @@ const StudentDashboard = () => {
                 <div className="text-xs font-black text-sky-400 flex items-center gap-2 group-hover:scale-110 transition-transform">
                   <Zap className="w-4 h-4 fill-sky-400" /> {x.t}
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>

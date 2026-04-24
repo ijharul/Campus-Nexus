@@ -29,9 +29,16 @@ const AlumniDonations = () => {
       // Handle deep linking from dashboard
       const params = new URLSearchParams(window.location.search);
       const campId = params.get('campaignId');
-      if (campId) {
+      if (campId && activeCamps.length > 0) {
         const found = activeCamps.find(ac => ac._id === campId);
-        if (found) setSelectedCampaign(found);
+        if (found) {
+          setSelectedCampaign(found);
+          // Auto-scroll to the selected campaign after a short delay to allow rendering
+          setTimeout(() => {
+            const el = document.getElementById(`campaign-${campId}`);
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 500);
+        }
       }
     } catch {
       toast.error('Failed to sync donation ecosystem.');
@@ -222,7 +229,11 @@ const AlumniDonations = () => {
              </div>
            ) : (
              campaigns.map(c => (
-                <div key={c._id} className="relative group rounded-[3rem] border border-white/[0.08] bg-slate-900/60 p-10 flex flex-col transition-all duration-700 hover:border-indigo-500/40 hover:shadow-[0_20px_50px_rgba(79,70,229,0.15)] shadow-2xl backdrop-blur-xl">
+                <div 
+                  key={c._id} 
+                  id={`campaign-${c._id}`}
+                  className={`relative group rounded-[3rem] border ${selectedCampaign?._id === c._id ? 'border-indigo-500 shadow-[0_0_40px_rgba(79,70,229,0.2)]' : 'border-white/[0.08]'} bg-slate-900/60 p-10 flex flex-col transition-all duration-700 hover:border-indigo-500/40 hover:shadow-[0_20px_50px_rgba(79,70,229,0.15)] shadow-2xl backdrop-blur-xl`}
+                >
                    <div className="flex justify-between items-start mb-10">
                       <div className="w-14 h-14 rounded-2xl bg-indigo-600 shadow-xl shadow-indigo-600/20 flex items-center justify-center text-white group-hover:scale-110 transition-transform">
                         <Heart className="w-7 h-7 fill-white/20" />

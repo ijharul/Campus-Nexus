@@ -182,13 +182,9 @@ const Directory = () => {
       const res = await api.get(`/users?${params.toString()}`);
 
       // Always client-side exclude: self, superAdmin, collegeAdmin
-      // And if current user is a student → also exclude other students
       let result = res.data.filter(
         (u) => u._id !== user?._id && u.role !== "superAdmin" && u.role !== "collegeAdmin"
       );
-      if (user?.role === "student") {
-        result = result.filter((u) => u.role === "alumni");
-      }
       setUsers(result);
     } catch {
       toast.error("Unable to load directory.");
@@ -197,14 +193,16 @@ const Directory = () => {
     }
   };
 
+  // Only set default role on initial mount
   useEffect(() => {
-    if (user) {
+    if (user && filters.role === "") {
       const roleOverride = user.role === "student" ? "alumni" : "";
       setFilters((p) => ({ ...p, role: roleOverride }));
-      // Pass role directly so it's used immediately, not after setState settles
       fetchUsers({ role: roleOverride });
+    } else {
+      fetchUsers();
     }
-  }, [isGlobal, user]);
+  }, [isGlobal, user?._id]);
 
   const handleSearch = (e) => { e.preventDefault(); fetchUsers(); };
 
@@ -253,7 +251,7 @@ const Directory = () => {
               <>Find <span className="bg-gradient-to-r from-sky-400 to-indigo-400 bg-clip-text text-transparent">Alumni</span></>
             )}
           </h1>
-          <p className="text-slate-400 font-medium text-base whitespace-nowrap overflow-hidden text-ellipsis leading-relaxed italic">
+          <p className="text-slate-400 font-medium text-sm lg:text-base leading-relaxed italic max-w-2xl">
             {user?.role === "alumni"
               ? "Source rising talent to mentor or connect with professional peers in the elite global network."
               : "Architect your professional path by connecting with institutional masters and alumni guides."}
@@ -286,8 +284,7 @@ const Directory = () => {
         </button>
 
         <form onSubmit={handleSearch} className={`flex flex-col lg:flex-row gap-4 items-end ${showFilters ? "flex" : "hidden lg:flex"}`}>
-          {user?.role !== "student" && (
-            <div className="w-full lg:w-44">
+          <div className="w-full lg:w-44">
               <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2 block">Role</label>
               <select
                 value={filters.role}
@@ -300,7 +297,6 @@ const Directory = () => {
                 <option value="top_mentors" className="bg-slate-900">Top Mentors</option>
               </select>
             </div>
-          )}
 
           <div className="flex-1">
             <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2 block">Company</label>

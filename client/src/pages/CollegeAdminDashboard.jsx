@@ -244,10 +244,7 @@ const UserManagement = ({ onRefresh }) => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      let endpoint = "/users/all";
-      if (view === "top") endpoint = "/college-admin/top-alumni";
-      if (view === "active") endpoint = "/college-admin/active-students";
-      const { data } = await api.get(endpoint);
+      const { data } = await api.get("/users/all");
       setUsers(Array.isArray(data) ? data : []);
     } catch {
       toast.error("Unable to retrieve member directory.");
@@ -275,11 +272,13 @@ const UserManagement = ({ onRefresh }) => {
     }
   };
 
-  const filtered = users.filter(
-    (u) =>
+  const filtered = users.filter((u) => {
+    const matchesSearch =
       u.name.toLowerCase().includes(search.toLowerCase()) ||
-      u.email.toLowerCase().includes(search.toLowerCase()),
-  );
+      u.email.toLowerCase().includes(search.toLowerCase());
+    const matchesView = view === "all" || u.role === view;
+    return matchesSearch && matchesView;
+  });
 
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-6 duration-700">
@@ -290,9 +289,9 @@ const UserManagement = ({ onRefresh }) => {
       >
         <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
           {[
-            ["all", "All Members"],
-            ["top", "Top Alumni"],
-            ["active", "Active Students"],
+            ["all", "Total Members"],
+            ["alumni", "Alumni"],
+            ["student", "Students"],
           ].map(([k, l]) => (
             <button
               key={k}

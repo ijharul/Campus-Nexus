@@ -99,8 +99,8 @@ export const getUsers = async (req, res, next) => {
     const { skills, company, role, global: isGlobal, collegeId } = req.query;
     const query = {};
 
-    // Don't filter by college for alumni role (allow cross-college networking)
-    if (isGlobal !== 'true' && role !== 'alumni') {
+    // Filter by college if not global
+    if (isGlobal !== 'true') {
       const scopeId = collegeId || req.user.collegeId;
       if (scopeId) query.collegeId = scopeId;
     }

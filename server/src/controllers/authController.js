@@ -1,5 +1,6 @@
 import User from "../models/User.js";
 import CollegeRequest from "../models/CollegeRequest.js";
+import College from "../models/College.js";
 import { sendCollegeRequestAlert, sendPasswordResetEmail } from "../utils/emailService.js";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
@@ -62,6 +63,30 @@ export const registerUser = async (req, res, next) => {
     const finalRole = allowedSelfRoles.includes(role) ? role : "student";
 
     const isOther = collegeId === 'other' || !collegeId;
+
+    // Check if the pending college already exists or is already requested
+    if (isOther && pendingCollege) {
+      const trimmedName = pendingCollege.trim();
+      
+      // 1. Check if it already exists in the College model (case-insensitive)
+      const existingCollege = await College.findOne({
+        name: { $regex: new RegExp(`^${trimmedName}$`, 'i') }
+      });
+      if (existingCollege) {
+        res.status(400);
+        throw new Error(`"${trimmedName}" is already available in the list. Please select it from the dropdown.`);
+      }
+
+      // 2. Check if there's already a pending request for this college
+      const existingRequest = await CollegeRequest.findOne({
+        collegeName: { $regex: new RegExp(`^${trimmedName}$`, 'i') },
+        status: 'pending'
+      });
+      if (existingRequest) {
+        res.status(400);
+        throw new Error(`A request for "${trimmedName}" is already under review. We will notify the platform as soon as it's added.`);
+      }
+    }
     const userData = {
       name,
       email,
